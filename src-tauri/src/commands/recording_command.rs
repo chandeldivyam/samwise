@@ -48,17 +48,34 @@ pub async fn transcribe_recording(app_handle: tauri::AppHandle, id: i64) -> Resu
     // Simulate transcription
     thread::sleep(Duration::from_secs(5));
 
-    // Update recording with transcription results
+    // Check if transcription is already available, if yes, we will not transcribe again
+    let recording_info = recording_service::get_recording(&state, id).map_err(|e| e.to_string())?;
+    let mut transcription = recording_info.transcription.clone();
+    if transcription.as_deref().unwrap_or("").is_empty() {
+        // Transcribe the recording
+        transcription = Some("This is a simulated transcription...".to_string());
+    }
+
+    // Getting the transcript according to user defined settings
+
+
+    // Storing the transcript to the database (better fallback mechanism if LLM fails)
+
+
+    // Fetching summary and action items from LLM (later building intelligence with mixture of agents)
+
+
+    // Update recording with insihts result
     let updates = serde_json::json!({
         "status": "Completed",
-        "transcription": "This is a simulated transcription...",
+        "transcription": transcription,
         "summary": "This is a simulated summary...",
         "action_items": "These are simulated action items..."
     });
     recording_service::update_recording(&state, id, &updates)
         .map_err(|e| e.to_string())?;
 
-    // Emit event to frontend
+    // Emit event to frontend for completion
     app_handle.emit_all("transcription_completed", id).map_err(|e| e.to_string())?;
     
     Ok(())

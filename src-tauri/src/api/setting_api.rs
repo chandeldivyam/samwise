@@ -9,11 +9,6 @@ pub async fn create_setting(state: State<'_, AppState>, setting: Setting) -> Res
 }
 
 #[tauri::command]
-pub async fn get_setting(state: State<'_, AppState>, id: i64) -> Result<Setting, String> {
-    setting_service::get_setting(&state, id).map_err(|e| e.to_string())
-}
-
-#[tauri::command]
 pub async fn update_setting(state: State<'_, AppState>, setting: Setting) -> Result<(), String> {
     setting_service::update_setting(&state, &setting).map_err(|e| e.to_string())
 }

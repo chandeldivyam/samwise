@@ -2,15 +2,15 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { useNavigate } from 'react-router-dom';
-import { User, DefaultSettings, GlobalContextType, Meeting } from '../types/global'
+import { User, DefaultSettings, GlobalContextType, Meeting, Setting } from '../types/global'
 
 const GlobalContext = createContext<GlobalContextType>({
   user: null,
-  defaultSettings: null,
   loading: true,
   setUser: () => {},
-  updateDefaultSettings: async () => {},
   updateMeeting: async () => {},
+  appSettings: null,
+  updateSettings: async () => {},
 });
 
 interface GlobalProviderProps {
@@ -20,18 +20,16 @@ interface GlobalProviderProps {
 export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const [defaultSettings, setDefaultSettings] = useState<DefaultSettings | null>(null);
-  const [loading, setLoading] = useState(true);  
+  const [loading, setLoading] = useState(true);
+  const [appSettings, setAppSettings] = useState<Setting[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
-        const settings: any[] = await invoke('get_all_settings', { userId: user.id });
-        const defaultSetting = settings.find(s => s.setting_type === 'default');
-        if (defaultSetting) {
-          setDefaultSettings(JSON.parse(defaultSetting.value));
-        }
+        const fetched_settings: Setting[] = await invoke('get_all_settings', { userId: user.id });
+        console.log(fetched_settings)
+        setAppSettings(fetched_settings);
       }
       else {
         setLoading(false);
@@ -42,31 +40,46 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     fetchUserData();
   }, [navigate]);
 
-  const updateDefaultSettings = async (newSettings: DefaultSettings) => {
+  const updateSettings = async (newSettings: Setting[]) => {
     try {
       if (!user) throw new Error("User not found");
-  
-      // Update the settings in the database
-      await invoke('update_setting', {
-        setting: {
-          user_id: user.id,
-          setting_type: 'default',
-          value: JSON.stringify(newSettings),
-        },
-      });
-      
-      // Refetch the settings from the database
-      const settings: any[] = await invoke('get_all_settings', { userId: user.id });
-      const defaultSetting = settings.find(s => s.setting_type === 'default');
-      if (defaultSetting) {
-        const updatedSettings = JSON.parse(defaultSetting.value);
-        setDefaultSettings(updatedSettings);
+
+      for (const setting of newSettings) {
+        const existingSetting = appSettings.find(s => s.setting_type === setting.setting_type);
+        if (existingSetting) {
+          console.log("new setting", setting)
+          await invoke('update_setting', {
+            setting: {
+              setting_type: setting.setting_type,
+              value: setting.value,
+              user_id: user.id,
+              title: setting.title,
+            },
+          });
+        }
+        else {
+          await invoke('create_setting', {
+            setting: {
+              setting_type: setting.setting_type,
+              value: setting.value,
+              user_id: user.id,
+              title: setting.title,
+            }
+          })
+        }
+        // Update it in the state
+        setAppSettings(prevSettings =>
+          prevSettings.map(s =>
+            s.id === setting.id ? { ...s, value: setting.value } : s
+          )
+        );
       }
+
     } catch (error) {
-      console.error('Failed to update default settings:', error);
-      throw error; // Rethrow the error so it can be caught in the component
+      console.error('Failed to update settings:', error);
+      throw error;
     }
-  };  
+  } 
 
   const updateMeeting = async (id: number, updates: Partial<Meeting>) => {
     try {
@@ -83,7 +96,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
   };
 
   return (
-    <GlobalContext.Provider value={{ user, defaultSettings, loading, setUser, updateDefaultSettings, updateMeeting }}>
+    <GlobalContext.Provider value={{ user, loading, setUser, updateMeeting, appSettings, updateSettings }}>
       {children}
     </GlobalContext.Provider>
   );

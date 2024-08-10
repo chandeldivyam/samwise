@@ -31,6 +31,7 @@ pub fn initialize_database(conn: &Connection) -> rusqlite::Result<()> {
             user_id INTEGER NOT NULL,
             type TEXT NOT NULL,
             value TEXT NOT NULL,
+            title TEXT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )",
         [],

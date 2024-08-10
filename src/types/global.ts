@@ -12,11 +12,11 @@ export interface DefaultSettings {
 
 export interface GlobalContextType {
     user: User | null;
-    defaultSettings: DefaultSettings | null;
     loading: boolean;
     setUser: (user: User | null) => void;
-    updateDefaultSettings: (newSettings: DefaultSettings) => Promise<void>;
     updateMeeting: (id: number, updates: Partial<Meeting>) => Promise<void>;
+    appSettings: Setting[] | null;
+    updateSettings: (newSettings: Setting[]) => Promise<void>;
 }
 
 export interface Meeting {
@@ -28,4 +28,22 @@ export interface Meeting {
     status: 'Recording' | 'Processing' | 'Processing_completed' | 'Transcribing' | 'Completed';
     created_at: string;
     file_path: string;
+}
+
+export interface Setting {
+    id?: number;
+    user_id: number;
+    setting_type: string;
+    value: string;
+    title?: string;
+}
+
+export interface SettingItem {
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    value: boolean | string;
+    showInSettings: boolean;
+    mandatory: boolean;
 }
