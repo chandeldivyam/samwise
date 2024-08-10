@@ -15,7 +15,7 @@ import {
 import { useGlobalContext } from '../contexts/GlobalContext';
 import { User } from '../types/global';
 import { ErrorComponent } from '../components/ErrorComponent';
-import { generateDefaultSettings } from '../constants/settings';
+import { generateAppSettings } from '../utils/createSettings';
 
 const Signup: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -52,13 +52,9 @@ const Signup: React.FC = () => {
         const user: User = await invoke('get_user', { id: userId });
         setUser(user);
 
-        // Create default settings
-        const settingToStore = await generateDefaultSettings(username, userId);
-
-        await invoke('create_setting', {
-          setting: settingToStore,
-        });
-
+        // Having another function which will create types of settings
+        await generateAppSettings(username, userId);
+        
       } else {
         // Assuming you have a way to check if the user exists (e.g., by fetching user data)
         const user: User = await invoke('get_user_by_name', { name: username });

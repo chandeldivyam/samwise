@@ -37,5 +37,43 @@ export const generateDefaultSettings = async (username: string, user_id: number)
         setting_type: 'default',
         value: JSON.stringify(defaultSettings),
         title: "Default Settings"
-    }
+    };
+}
+
+export const generateTranscriptionSettings = async (user_id: number): Promise<Setting> => {
+    const transcriptionSettings: SettingItem[] = [
+      {
+        id: "useCloudTranscription",
+        type: "boolean",
+        title: "Use Cloud Transcription",
+        description: "Using cloud providers like groq and deepgram for speech to text transcription",
+        value: true,
+        showInSettings: true,
+        mandatory: true,
+      },
+      {
+        id: "deepgramApiKey",
+        type: "string",
+        title: "Deepgram API key",
+        description: "Deepgram provide $200 free credits which would last for 700 hours of recordings",
+        value: "",
+        showInSettings: true,
+        mandatory: false,
+      },
+      {
+        id: "deepgramApiKey",
+        type: "string",
+        title: "Deepgram API key",
+        description: "Deepgram provide $200 free credits which would last for 700 hours of recordings",
+        value: "",
+        showInSettings: true,
+        mandatory: false,
+      }
+    ];
+    return {
+        user_id: user_id,
+        setting_type: 'transcription',
+        value: JSON.stringify(transcriptionSettings),
+        title: "Transcription Settings"
+    };
 }
