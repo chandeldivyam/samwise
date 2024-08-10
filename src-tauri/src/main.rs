@@ -6,6 +6,7 @@ mod services;
 mod api;
 mod utils;
 mod commands;
+mod audio_processor;
 
 use db::AppState;
 use api::user_api::{create_user, get_user, update_user, delete_user, get_user_by_name};

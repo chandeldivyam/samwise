@@ -35,6 +35,8 @@ const Meetings: React.FC = () => {
             meeting.id === processedMeetingId ? { ...meeting, status: 'Processing_completed' } : meeting
           )
         );
+        // Ideally we should not update from here
+        updateMeeting(processedMeetingId, { status: 'Processing_completed' });
       });
 
       const unlistenTranscription = listen('transcription_completed', (event: any) => {
@@ -165,25 +167,9 @@ const Meetings: React.FC = () => {
 };
 
   const handleStopRecording = async (meetingId: number) => {
-    // setRecording(false);
-    // setRecordingTime(0);
-
-    // Clear the interval when the recording stops
-    // if (intervalId.current) {
-    //   clearInterval(intervalId.current);
-    //   intervalId.current = null;
-    // }
-
     if (user) {
       try {
         setDisableRecordingButton(true);
-        await updateMeeting(meetingId, { status: 'Processing' });
-        // setMeetings(prevMeetings =>
-        //   prevMeetings.map(meeting =>
-        //     meeting.id === meetingId ? { ...meeting, status: 'Processing' } : meeting
-        //   )
-        // );
-
         await invoke('process_recording', { id: meetingId });
       } catch (error) {
         console.error('Failed to update recording:', error);
@@ -193,7 +179,6 @@ const Meetings: React.FC = () => {
 
   const handleTranscribe = async (id: number) => {
     try {
-      await updateMeeting(id, { status: 'Transcribing' });
       setMeetings(prevMeetings =>
         prevMeetings.map(meeting =>
           meeting.id === id ? { ...meeting, status: 'Transcribing' } : meeting
