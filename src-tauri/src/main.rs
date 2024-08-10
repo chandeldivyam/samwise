@@ -11,7 +11,7 @@ mod audio_processor;
 use db::AppState;
 use api::user_api::{create_user, get_user, update_user, delete_user, get_user_by_name};
 use api::recording_api::{get_recording, get_all_recordings, update_recording};
-use api::setting_api::{create_setting, get_setting, update_setting, delete_setting, get_all_settings};
+use api::setting_api::{create_setting, update_setting, delete_setting, get_all_settings};
 use commands::recording_command::{create_recording, process_recording, transcribe_recording, stop_recording};
 
 use tauri::Manager;
@@ -33,7 +33,6 @@ fn main() {
             get_recording,
             update_recording,
             create_setting,
-            get_setting,
             update_setting,
             delete_setting,
             get_all_settings,

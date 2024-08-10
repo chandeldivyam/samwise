@@ -6,7 +6,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 import MeetingList from '../components/MeetingList';
 import MeetingDialog from '../components/MeetingDialog';
 import { useGlobalContext } from '../contexts/GlobalContext';
-import { Meeting } from '../types/global';
+import { Meeting, SettingItem, Setting } from '../types/global';
 import { listen } from '@tauri-apps/api/event';
 import { path } from '@tauri-apps/api';
 
@@ -20,7 +20,7 @@ const Meetings: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [disableRecordingButton, setDisableRecordingButton] = useState(false);
   const navigate = useNavigate();
-  const { user, updateMeeting, defaultSettings } = useGlobalContext();
+  const { user, updateMeeting, appSettings } = useGlobalContext();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const intervalId = useRef<NodeJS.Timeout | null>(null); // Add a ref to store the interval ID
 
@@ -141,14 +141,30 @@ const Meetings: React.FC = () => {
   const handleStartRecording = async (name: string) => {
     setOpenDialog(false);
 
-    if (user && defaultSettings) {
+    if (user && appSettings) {
         try {
             // Generate a unique filename using name and timestamp
             const timestamp = new Date().getTime();
             const fileName = `${name.replace(/\s+/g, '_')}_${timestamp}.mp3`;
-            const filePath = await path.join(defaultSettings.recordingDirectory, fileName);
+            // appSettings is an array of objects where each object has a setting_type we need to find the object with setting_type as "default"
+            const defaultSettings = appSettings.find(setting => setting.setting_type === 'default') 
+            console.log(appSettings);
+            if (!defaultSettings || !defaultSettings.value) {
+              console.error('Default settings not found');
+              return;
+            }
 
-            console.log(filePath);
+            console.log(defaultSettings);
+
+            const allDefaultSettings: SettingItem[] = JSON.parse(defaultSettings.value);
+            const recordingDirectorySetting = allDefaultSettings.find(setting => setting.id === 'recordingDirectory')
+
+            if (!recordingDirectorySetting || !recordingDirectorySetting.value || typeof(recordingDirectorySetting.value) !== 'string') {
+              console.error('Recording directory not found');
+              return;
+            }
+
+            const filePath = await path.join(recordingDirectorySetting.value, fileName);
 
             // Create the recording, which will automatically start it
             await invoke<number>('create_recording', {

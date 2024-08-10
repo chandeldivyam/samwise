@@ -4,11 +4,14 @@ use rusqlite::{params, Result};
 
 pub fn create_user(state: &AppState, user: &User) -> Result<i64> {
     let conn = state.db.lock().unwrap();
-    conn.execute(
-        "INSERT INTO users (name) VALUES (?1)",
-        params![user.name],
-    )?;
-    Ok(conn.last_insert_rowid())
+
+    // Prepare the INSERT statement with RETURNING id
+    let mut stmt = conn.prepare("INSERT INTO users (name) VALUES (?1) RETURNING id")?;
+    
+    // Execute the query and fetch the returned id
+    let user_id: i64 = stmt.query_row(params![user.name], |row| row.get(0))?;
+
+    Ok(user_id)
 }
 
 pub fn get_user(state: &AppState, id: i64) -> Result<User> {
