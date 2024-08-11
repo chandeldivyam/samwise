@@ -1,7 +1,8 @@
 use crate::db::AppState;
 use crate::services::recording_service;
+use crate::services::setting_service;
+use crate::audio_processor::audio_transcription::TranscriptionManager;
 use tauri::{Manager, State};
-use std::{thread, time::Duration};
 use crate::audio_processor::audio_recorder::AudioRecorder;
 
 #[tauri::command]
@@ -39,41 +40,49 @@ pub async fn process_recording(app_handle: tauri::AppHandle, window: tauri::Wind
 
 #[tauri::command]
 pub async fn transcribe_recording(app_handle: tauri::AppHandle, id: i64) -> Result<(), String> {
+    // Helper function to revert status on error
+    
     let state: State<AppState> = app_handle.state();
+    let revert_status_on_error = |err: String| -> String {
+        let _ = recording_service::update_recording(&state, id, &serde_json::json!({"status": "Processing_completed"}));
+        err
+    };
     
     // Update recording status
     recording_service::update_recording(&state, id, &serde_json::json!({"status": "Transcribing"}))
         .map_err(|e| e.to_string())?;
 
-    // Simulate transcription
-    thread::sleep(Duration::from_secs(5));
-
     // Check if transcription is already available, if yes, we will not transcribe again
     let recording_info = recording_service::get_recording(&state, id).map_err(|e| e.to_string())?;
-    let mut transcription = recording_info.transcription.clone();
-    if transcription.as_deref().unwrap_or("").is_empty() {
-        // Transcribe the recording
-        transcription = Some("This is a simulated transcription...".to_string());
+    if let Some(existing_transcription) = recording_info.transcription {
+        if !existing_transcription.is_empty() {
+            return Ok(());
+        }
     }
 
+    let settings = setting_service::get_settings_by_type(&state, recording_info.user_id, "transcription")
+        .map_err(|e| revert_status_on_error(e.to_string()))?;
+
+    let transcription_manager = TranscriptionManager::new(&settings)
+        .map_err(revert_status_on_error)?;
+
+    let transcription = match &recording_info.file_path {
+        Some(file_path) => transcription_manager.transcribe(file_path).await
+            .map_err(revert_status_on_error)?,
+        None => return Err(revert_status_on_error("Recording file path is missing".to_string())),
+    };
+
     // Getting the transcript according to user defined settings
-
-
-    // Storing the transcript to the database (better fallback mechanism if LLM fails)
-
-
-    // Fetching summary and action items from LLM (later building intelligence with mixture of agents)
-
-
-    // Update recording with insihts result
     let updates = serde_json::json!({
         "status": "Completed",
         "transcription": transcription,
-        "summary": "This is a simulated summary...",
-        "action_items": "These are simulated action items..."
     });
+
+    // Storing the transcript to the database (better fallback mechanism if LLM fails)
     recording_service::update_recording(&state, id, &updates)
-        .map_err(|e| e.to_string())?;
+        .map_err(|_e| revert_status_on_error("Recording file path is missing".to_string()))?;
+
+    // Fetching summary and action items from LLM (later building intelligence with mixture of agents)
 
     // Emit event to frontend for completion
     app_handle.emit_all("transcription_completed", id).map_err(|e| e.to_string())?;

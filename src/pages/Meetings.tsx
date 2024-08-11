@@ -9,7 +9,7 @@ import { useGlobalContext } from '../contexts/GlobalContext';
 import { Meeting, SettingItem, Setting } from '../types/global';
 import { listen } from '@tauri-apps/api/event';
 import { path } from '@tauri-apps/api';
-
+import { sanitizeFileName } from '../utils/utils';
 /*
   TODO - (Divyam): We need to handle the case where person moves between pages while recording is being processed
   This should be driven by the tauri backend to tell that if the recording has started or not. if yes, we can start recording. Tell then it should be a loader
@@ -20,7 +20,7 @@ const Meetings: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [disableRecordingButton, setDisableRecordingButton] = useState(false);
   const navigate = useNavigate();
-  const { user, updateMeeting, appSettings } = useGlobalContext();
+  const { user, updateMeeting, appSettings, showMessage } = useGlobalContext();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const intervalId = useRef<NodeJS.Timeout | null>(null); // Add a ref to store the interval ID
 
@@ -40,7 +40,6 @@ const Meetings: React.FC = () => {
       });
 
       const unlistenTranscription = listen('transcription_completed', (event: any) => {
-        console.log(event.payload)
         fetchMeetings(); // Refetch all meetings to get the updated data
       });
 
@@ -125,7 +124,6 @@ const Meetings: React.FC = () => {
     if (user) {
       try {
         const fetchedMeetings = await invoke<Meeting[]>('get_all_recordings', { userId: user.id });
-        console.log('Fetched meetings:', fetchedMeetings);
         setMeetings(fetchedMeetings);
         return fetchedMeetings;
       } catch (error) {
@@ -145,16 +143,14 @@ const Meetings: React.FC = () => {
         try {
             // Generate a unique filename using name and timestamp
             const timestamp = new Date().getTime();
-            const fileName = `${name.replace(/\s+/g, '_')}_${timestamp}.mp3`;
+            const name_samatized = sanitizeFileName(name);
+            const fileName = `${name_samatized.replace(/\s+/g, '_')}_${timestamp}.mp3`;
             // appSettings is an array of objects where each object has a setting_type we need to find the object with setting_type as "default"
             const defaultSettings = appSettings.find(setting => setting.setting_type === 'default') 
-            console.log(appSettings);
             if (!defaultSettings || !defaultSettings.value) {
               console.error('Default settings not found');
               return;
             }
-
-            console.log(defaultSettings);
 
             const allDefaultSettings: SettingItem[] = JSON.parse(defaultSettings.value);
             const recordingDirectorySetting = allDefaultSettings.find(setting => setting.id === 'recordingDirectory')
@@ -203,7 +199,12 @@ const Meetings: React.FC = () => {
 
       await invoke('transcribe_recording', { id });
     } catch (error) {
-      console.error('Failed to transcribe recording:', error);
+      showMessage(`${error}`, 'error');
+      setMeetings(prevMeetings =>
+        prevMeetings.map(meeting =>
+          meeting.id === id ? { ...meeting, status: 'Processing_completed' } : meeting
+        )
+      );
     }
   };
   

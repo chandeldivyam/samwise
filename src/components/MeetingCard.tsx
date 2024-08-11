@@ -26,7 +26,7 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ meeting, onTranscribe, onSele
           {meeting.name}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Created: {moment(meeting.createdAt).fromNow()}
+          Created: {moment(meeting.created_at).fromNow()}
         </Typography>
         <Box display="flex" alignItems="center" mt={1}>
           {meeting.status === 'Recording' && (
@@ -73,13 +73,6 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ meeting, onTranscribe, onSele
             </>
           )}
         </Box>
-        {meeting.status === 'Completed' && (
-          <>
-            <Typography variant="body2" mt={2}>
-              {meeting.summary}
-            </Typography>
-          </>
-        )}
         {meeting.status === 'Processing_completed' && (
           <Button
             variant="outlined"

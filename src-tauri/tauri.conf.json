@@ -19,6 +19,10 @@
       "path": {
         "all": true
       },
+      "fs": {
+        "all": true,
+        "scope": ["**"]
+      },
       "dialog": {
         "all": true,
         "ask": true,
@@ -26,7 +30,12 @@
         "message": true,
         "open": true,
         "save": true
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": ["**"]
       }
+
     },
     "windows": [
       {
@@ -36,7 +45,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost; img-src 'self' asset: https://asset.localhost"
     },
     "bundle": {
       "active": true,

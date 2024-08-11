@@ -1,6 +1,7 @@
 use crate::db::models::setting::Setting;
 use crate::db::AppState;
 use rusqlite::{params, Result};
+use serde_json::Value;
 
 pub fn create_setting(state: &AppState, setting: &Setting) -> Result<i64> {
     let conn = state.db.lock().unwrap();
@@ -31,4 +32,25 @@ pub fn get_all_settings(state: &AppState, user_id: i64) -> Result<Vec<Setting>> 
     let mut stmt = conn.prepare("SELECT * FROM settings WHERE user_id = ?1")?;
     let settings_iter = stmt.query_map(params![user_id], |row| Setting::from_row(row))?;
     settings_iter.collect()
+}
+
+pub fn get_settings_by_type(state: &AppState, user_id: i64, setting_type: &str) -> Result<Value> {
+    let conn = state.db.lock().unwrap();
+    let query = "SELECT value FROM settings WHERE user_id = ?1 AND type = ?2";
+
+    let mut stmt = conn.prepare(query)?;
+    let mut rows = stmt.query(params![user_id, setting_type])?;
+    
+    if let Some(row) = rows.next()? {
+        let value: String = row.get(0)?;
+        // Parse the JSON string into a serde_json::Value
+        serde_json::from_str(&value).map_err(|e| rusqlite::Error::FromSqlConversionFailure(
+            0,
+            rusqlite::types::Type::Text,
+            Box::new(e)
+        ))
+    } else {
+        // If no settings found, return an empty JSON object
+        Ok(serde_json::json!({}))
+    }
 }

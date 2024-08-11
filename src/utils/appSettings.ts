@@ -1,24 +1,37 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import { generateDefaultSettings, generateTranscriptionSettings } from '../constants/settings';
+import { generateDefaultSettings, generateTranscriptionSettings, generateTextGenerationSettings } from '../constants/settings';
+import { Setting } from '../types/global';
 
-export const generateAppSettings = async(username: string, user_id: number): Promise<void> => {
-    const settingsToUpdate = []
-
-    // Create Default Settings
-    const defaultSettings = await generateDefaultSettings(username, user_id);
-    settingsToUpdate.push(defaultSettings)
-
-    // Create Transcription Settings
-    const transcriptionSettings = await generateTranscriptionSettings(user_id);
-    settingsToUpdate.push(transcriptionSettings)
-
-    // Storing this information to the database
-    for (const setting of settingsToUpdate) {
-        await storeToDb(setting)
+export const ensureUserSettings = async (username: string, user_id: number): Promise<Setting[]> => {
+    const settingTypes = ['default', 'transcription', 'text_generation'];
+    let allSettings: Setting[] = await invoke('get_all_settings', { userId: user_id });
+    
+    for (const settingType of settingTypes) {
+        if (!allSettings.some(s => s.setting_type === settingType)) {
+            let newSetting: Setting | undefined;
+            
+            if (settingType === 'default') {
+                newSetting = await generateDefaultSettings(username, user_id);
+            } else if (settingType === 'transcription') {
+                newSetting = await generateTranscriptionSettings(user_id);
+            } 
+            else if (settingType === 'text_generation') {
+                newSetting = await generateTextGenerationSettings(user_id);
+            } else {
+                console.error(`Unknown setting type: ${settingType}`);
+                continue; // Skip to the next iteration if settingType is not recognized
+            }
+            
+            if (newSetting) {
+                await storeToDb(newSetting);
+                allSettings.push(newSetting);
+            }
+        }
     }
     
-    return;
+    return allSettings;
 }
+
 
 const storeToDb = async(setting: any) => {
     try {

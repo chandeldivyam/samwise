@@ -15,7 +15,7 @@ import {
 import { useGlobalContext } from '../contexts/GlobalContext';
 import { User } from '../types/global';
 import { ErrorComponent } from '../components/ErrorComponent';
-import { generateAppSettings } from '../utils/createSettings';
+import { ensureUserSettings  } from '../utils/appSettings';
 
 const Signup: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -37,47 +37,43 @@ const Signup: React.FC = () => {
     event.preventDefault();
 
     try {
-      if (signupOption === 'signup') {
-        // Check if user already exists then create
-        try {
-          const user: User = await invoke('get_user_by_name', { name: username });
-          if (user) {
-            setError('User already exists! Please login or choose another username');
-            return;
-          }
-        } catch (error) {
-          console.log("No user found, creating a user")
+        let user: User;
+
+        if (signupOption === 'signup') {
+            // Check if user already exists
+            try {
+                user = await invoke('get_user_by_name', { name: username });
+                if (user) {
+                    setError('User already exists! Please login or choose another username');
+                    return;
+                }
+            } catch (error) {
+                console.log("No user found, creating a new user");
+            }
+
+            const userId: number = await invoke('create_user', { user: { name: username } });
+            user = await invoke('get_user', { id: userId });
+        } else {
+            // Login
+            user = await invoke('get_user_by_name', { name: username });
+            if (!user) {
+                setError('User not found!');
+                return;
+            }
         }
-        const userId: number = await invoke('create_user', { user: { name: username } });
-        const user: User = await invoke('get_user', { id: userId });
+
         setUser(user);
 
-        // Having another function which will create types of settings
-        await generateAppSettings(username, userId);
-        
-      } else {
-        // Assuming you have a way to check if the user exists (e.g., by fetching user data)
-        const user: User = await invoke('get_user_by_name', { name: username });
-        console.log('User found:', user);
-        if (user) {
-          setUser(user);
-          console.log('User found:', user);
-        } else {
-          console.error('User not found');
-          setError('User not found!');
-          return;
-        }
-      }
+        // Ensure user settings exist and update the context
+        await ensureUserSettings(username, user.id);
 
-      // Navigate to the main page after successful signup or login
-      navigate('/');
+        // Navigate to the main page after successful signup or login
+        navigate('/');
     } catch (error) {
-      setError('User not found!');
-      console.error('Error during signup/login:', error);
-      // Handle the error (e.g., display an error message)
+        setError('An error occurred during signup/login');
+        console.error('Error during signup/login:', error);
     }
-  };
-
+};
   return (
     <Box sx={{ maxWidth: 400, margin: 'auto', mt: 5 }}>
       <Typography variant="h4" gutterBottom>
