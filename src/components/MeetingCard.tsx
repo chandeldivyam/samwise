@@ -20,7 +20,15 @@ interface MeetingCardProps {
 
 const MeetingCard: React.FC<MeetingCardProps> = ({ meeting, onTranscribe, onSelect }) => {
   return (
-    <Card onClick={() => onSelect(meeting.id)}>
+    <Card 
+      onClick={() => onSelect(meeting.id)}
+      sx={{
+        ':hover': {
+          boxShadow: 5, // Enhanced shadow on hover
+          cursor: 'pointer', // Change cursor to pointer on hover
+        },
+      }}
+    >
       <CardContent>
         <Typography variant="h5" component="div">
           {meeting.name}

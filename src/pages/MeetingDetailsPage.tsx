@@ -11,6 +11,7 @@ import SummarySection from '../components/SummarySection';
 import { useGlobalContext } from '../contexts/GlobalContext';
 import ChatSection from '../components/ChatSection';
 import { GeminiChatHistory } from '../types/global';
+import { get } from 'lodash';
 
 const FixedTopBar = styled(Paper)(({ theme }) => ({
   position: 'sticky',
@@ -30,7 +31,7 @@ const MeetingDetailsPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
-  const { updateMeeting } = useGlobalContext();
+  const { updateMeeting, showMessage } = useGlobalContext();
   const [chatHistory, setChatHistory] = useState<GeminiChatHistory[]>([]);
 
   useEffect(() => {
@@ -78,7 +79,7 @@ const MeetingDetailsPage: React.FC = () => {
     }
   };
   
-  const handleSliderChange = (event: Event, newValue: number | number[]) => {
+  const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     if (audioRef.current && typeof newValue === 'number') {
       audioRef.current.currentTime = newValue;
       setCurrentTime(newValue);
@@ -92,7 +93,7 @@ const MeetingDetailsPage: React.FC = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
     if (newValue === 0) {
       scrollToCurrentTime(currentTime);
@@ -115,36 +116,41 @@ const MeetingDetailsPage: React.FC = () => {
   };
 
   if (!meeting) return <Typography>Loading...</Typography>;
-  if (meeting.status === 'Processing_completed') {
-    return (<Box>
-      <FixedTopBar elevation={3}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <Typography variant="h5">{meeting.name}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              {moment(meeting.created_at).format('MMMM D, YYYY [at] h:mm A')}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <AudioPlayer
-              filePath={meeting.file_path}
-              onTimeUpdate={handleTimeUpdate}
-              audioRef={audioRef}
-              onSeeked={handleAudioSeeked}
-            />
-            <Slider
-              value={currentTime}
-              max={audioRef.current?.duration || 0}
-              onChange={handleSliderChange}
-              aria-label="audio progress"
-            />
-          </Grid>
+  const onlyAudioComponent = (<Box>
+    <FixedTopBar elevation={3}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12} md={6}>
+          <Typography variant="h5">{meeting.name}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {moment(meeting.created_at).format('MMMM D, YYYY [at] h:mm A')}
+          </Typography>
         </Grid>
-      </FixedTopBar>
-    </Box>)
+        <Grid item xs={12} md={6}>
+          <AudioPlayer
+            filePath={meeting.file_path}
+            onTimeUpdate={handleTimeUpdate}
+            audioRef={audioRef}
+            onSeeked={handleAudioSeeked}
+          />
+          <Slider
+            value={currentTime}
+            max={audioRef.current?.duration || 0}
+            onChange={handleSliderChange}
+            aria-label="audio progress"
+          />
+        </Grid>
+      </Grid>
+    </FixedTopBar>
+  </Box>)
+  if (meeting.status === 'Processing_completed' || meeting.status === 'Transcribing') {
+    return onlyAudioComponent;
   }
 
   if (!meeting.transcription) return <Typography>Loading...</Typography>;
+  if (!get(JSON.parse(meeting.transcription), 'results.channels[0].alternatives[0].paragraphs.paragraphs')){
+    showMessage('Some error occoured in transcription', 'error');
+    return onlyAudioComponent;
+  }
 
   return (
     <Box>

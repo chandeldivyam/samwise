@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 
 const Automations: React.FC = () => {
   return (
-    <Typography variant="h4">Automations Page</Typography>
+    <Typography variant="h4">Coming Soon</Typography>
   );
 };
 

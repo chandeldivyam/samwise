@@ -51,6 +51,6 @@ Transcript: ${transcript}
 
 Summary: ${summary}
 
-How can I assist you with this meeting information?`;
+Please respond with as much facts as possible and within the context. Try to be crisp and clear.`;
    return CHAT_CONTEXT;
 };

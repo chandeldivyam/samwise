@@ -118,3 +118,10 @@ pub async fn stop_recording(app_handle: tauri::AppHandle, id: i64) -> Result<(),
 
     Ok(())
 }
+
+#[tauri::command]
+pub async fn upload_recording(app_handle: tauri::AppHandle, recording: serde_json::Value) -> Result<i64, String> {
+    let state: State<AppState> = app_handle.state();
+    let recording_id = recording_service::create_recording_from_json(&state, &recording).map_err(|e| e.to_string())?;
+    Ok(recording_id)
+}

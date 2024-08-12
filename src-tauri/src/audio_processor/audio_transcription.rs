@@ -121,14 +121,15 @@ impl TranscriptionService for DeepgramService {
     }
 }
 
+// While implementing, we should remove "_" from variable declaration
 struct GroqService {
-    api_key: String,
+    _api_key: String,
 }
 
 impl GroqService {
     fn new(api_key: &str) -> Self {
         Self {
-            api_key: api_key.to_string(),
+            _api_key: api_key.to_string(),
         }
     }
 }

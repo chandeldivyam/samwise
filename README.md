@@ -1,6 +1,6 @@
-# OpenSAM
+# Samwise
 
-Welcome to **OpenSAM**—an open-source project built using [Tauri](https://tauri.app/). This application is designed to be lightweight, secure, and fast, leveraging the power of Rust and web technologies.
+Welcome to **samwise**—an open-source project built using [Tauri](https://tauri.app/). This application is designed to be lightweight, secure, and fast, leveraging the power of Rust and web technologies.
 
 ## Prerequisites
 
@@ -17,8 +17,8 @@ Next, follow the Tauri setup guide to install additional dependencies: [Tauri Se
 ## Getting Started
 1. Clone the repository:
 ```bash
-git clone git@github.com:chandeldivyam/opensam.git
-cd opensam
+git clone git@github.com:chandeldivyam/samwise.git
+cd samwise
 ```
 2. Install dependencies:
 If you haven't already, you'll need to install `npm`, `yarn`, or `pnpm`. Choose one of these package managers to install the project's dependencies:

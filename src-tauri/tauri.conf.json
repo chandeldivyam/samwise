@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "opensam",
+    "productName": "samwise",
     "version": "0.0.0"
   },
   "tauri": {
@@ -39,18 +39,18 @@
     },
     "windows": [
       {
-        "title": "opensam",
+        "title": "samwise",
         "width": 800,
         "height": 600
       }
     ],
     "security": {
-      "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost; img-src 'self' asset: https://asset.localhost"
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' asset: https://asset.localhost; img-src 'self' asset: https://asset.localhost"
     },
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "opensam",
+      "identifier": "samwise",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

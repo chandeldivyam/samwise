@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { useNavigate } from 'react-router-dom';
-import { User, DefaultSettings, GlobalContextType, Meeting, Setting } from '../types/global'
+import { User, GlobalContextType, Meeting, Setting } from '../types/global'
 import SnackbarAlert from '../components/SnackbarAlert';
 
 const GlobalContext = createContext<GlobalContextType>({
@@ -43,6 +43,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
 
     fetchUserData();
   }, [navigate]);
+
+  console.log(meetings);
 
   const showMessage = (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
     setSnackbarMessage(message);

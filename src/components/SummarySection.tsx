@@ -3,7 +3,6 @@ import {
   Box, Button, TextField, Typography, CircularProgress, IconButton,
   Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { generateText } from '../utils/textGeneration';
 import { GeminiChatHistory } from '../types/global';
@@ -111,7 +110,7 @@ const SummarySection: React.FC<SummarySectionProps> = ({ transcript, initialSumm
       )}
 
       <Dialog open={isPromptDialogOpen} onClose={() => setIsPromptDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Edit Summary Prompt</DialogTitle>
+        <DialogTitle>Edit Prompt</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
