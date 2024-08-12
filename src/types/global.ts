@@ -17,6 +17,7 @@ export interface GlobalContextType {
     updateMeeting: (id: number, updates: Partial<Meeting>) => Promise<void>;
     appSettings: Setting[] | null;
     updateSettings: (newSettings: Setting[]) => Promise<void>;
+    showMessage: (message: string, severity?: 'success' | 'error' | 'warning' | 'info') => void;
 }
 
 export interface Meeting {
@@ -46,4 +47,10 @@ export interface SettingItem {
     value: boolean | string;
     showInSettings: boolean;
     mandatory: boolean;
+    secret: boolean;
+}
+
+export interface GeminiChatHistory {
+    role: "user" | "model";
+    parts: { text: string }[];
 }

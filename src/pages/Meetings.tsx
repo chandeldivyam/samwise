@@ -1,28 +1,45 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
-import { FiberManualRecord } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
+import { FiberManualRecord, Stop, Sort, CloudUpload } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { invoke } from '@tauri-apps/api/tauri';
 import MeetingList from '../components/MeetingList';
 import MeetingDialog from '../components/MeetingDialog';
 import { useGlobalContext } from '../contexts/GlobalContext';
-import { Meeting, SettingItem, Setting } from '../types/global';
+import { Meeting, SettingItem } from '../types/global';
 import { listen } from '@tauri-apps/api/event';
 import { path } from '@tauri-apps/api';
+import { sanitizeFileName } from '../utils/utils';
+import { open } from '@tauri-apps/api/dialog';
+import UploadDialog from '../components/UploadDialog';
 
-/*
-  TODO - (Divyam): We need to handle the case where person moves between pages while recording is being processed
-  This should be driven by the tauri backend to tell that if the recording has started or not. if yes, we can start recording. Tell then it should be a loader
-*/
 const Meetings: React.FC = () => {
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [disableRecordingButton, setDisableRecordingButton] = useState(false);
   const navigate = useNavigate();
-  const { user, updateMeeting, appSettings } = useGlobalContext();
+  const { user, updateMeeting, appSettings, showMessage } = useGlobalContext();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const intervalId = useRef<NodeJS.Timeout | null>(null); // Add a ref to store the interval ID
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const filterStatus = '';
+  const [sortKey, setSortKey] = useState<'name' | 'created_at'>('created_at');
+  const [filterName, setFilterName] = useState<string>('');
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
+
+  const handleSortToggle = () => {
+    setSortOrder((prevOrder) => (prevOrder === 'asc' ? 'desc' : 'asc'));
+  };
 
   useEffect(() => {
     if (user) {
@@ -35,13 +52,11 @@ const Meetings: React.FC = () => {
             meeting.id === processedMeetingId ? { ...meeting, status: 'Processing_completed' } : meeting
           )
         );
-        // Ideally we should not update from here
         updateMeeting(processedMeetingId, { status: 'Processing_completed' });
       });
 
-      const unlistenTranscription = listen('transcription_completed', (event: any) => {
-        console.log(event.payload)
-        fetchMeetings(); // Refetch all meetings to get the updated data
+      const unlistenTranscription = listen('transcription_completed', () => {
+        fetchMeetings();
       });
 
       return () => {
@@ -52,8 +67,7 @@ const Meetings: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    const unlistenRecordingStarted = listen('recording_started', (event: any) => {
-      const recordingMeetingId = event.payload as number;
+    const unlistenRecordingStarted = listen('recording_started', () => {
       setRecording(true);
       setRecordingTime(0);
   
@@ -61,11 +75,10 @@ const Meetings: React.FC = () => {
         setRecordingTime(prevTime => prevTime + 1);
       }, 1000);
 
-      // We need to get the recording item and update the meeting state
       fetchMeetings();
     });
   
-    const unlistenRecordingStopped = listen('recording_stopped', (event: any) => {
+    const unlistenRecordingStopped = listen('recording_stopped', () => {
       setRecording(false);
       setRecordingTime(0);
       setDisableRecordingButton(false);
@@ -76,8 +89,6 @@ const Meetings: React.FC = () => {
       }
       fetchMeetings();
     });
-  
-    // We need to fetch the recordings as well with new state
 
     return () => {
       unlistenRecordingStarted.then(f => f());
@@ -125,7 +136,6 @@ const Meetings: React.FC = () => {
     if (user) {
       try {
         const fetchedMeetings = await invoke<Meeting[]>('get_all_recordings', { userId: user.id });
-        console.log('Fetched meetings:', fetchedMeetings);
         setMeetings(fetchedMeetings);
         return fetchedMeetings;
       } catch (error) {
@@ -138,49 +148,48 @@ const Meetings: React.FC = () => {
     setOpenDialog(true);
   };
 
+  const handleUpload = () => {
+    setOpenUploadDialog(true);
+  }
+
   const handleStartRecording = async (name: string) => {
     setOpenDialog(false);
 
     if (user && appSettings) {
-        try {
-            // Generate a unique filename using name and timestamp
-            const timestamp = new Date().getTime();
-            const fileName = `${name.replace(/\s+/g, '_')}_${timestamp}.mp3`;
-            // appSettings is an array of objects where each object has a setting_type we need to find the object with setting_type as "default"
-            const defaultSettings = appSettings.find(setting => setting.setting_type === 'default') 
-            console.log(appSettings);
-            if (!defaultSettings || !defaultSettings.value) {
-              console.error('Default settings not found');
-              return;
-            }
-
-            console.log(defaultSettings);
-
-            const allDefaultSettings: SettingItem[] = JSON.parse(defaultSettings.value);
-            const recordingDirectorySetting = allDefaultSettings.find(setting => setting.id === 'recordingDirectory')
-
-            if (!recordingDirectorySetting || !recordingDirectorySetting.value || typeof(recordingDirectorySetting.value) !== 'string') {
-              console.error('Recording directory not found');
-              return;
-            }
-
-            const filePath = await path.join(recordingDirectorySetting.value, fileName);
-
-            // Create the recording, which will automatically start it
-            await invoke<number>('create_recording', {
-                recording: {
-                    user_id: user.id,
-                    name,
-                    status: 'Recording',
-                    created_at: new Date().toISOString(),
-                    file_path: filePath 
-                }
-            });
-        } catch (error) {
-            console.error('Failed to create recording:', error);
+      try {
+        const timestamp = new Date().getTime();
+        const name_samatized = sanitizeFileName(name);
+        const fileName = `${name_samatized.replace(/\s+/g, '_')}_${timestamp}.mp3`;
+        const defaultSettings = appSettings.find(setting => setting.setting_type === 'default');
+        if (!defaultSettings || !defaultSettings.value) {
+          console.error('Default settings not found');
+          return;
         }
+
+        const allDefaultSettings: SettingItem[] = JSON.parse(defaultSettings.value);
+        const recordingDirectorySetting = allDefaultSettings.find(setting => setting.id === 'recordingDirectory');
+
+        if (!recordingDirectorySetting || !recordingDirectorySetting.value || typeof(recordingDirectorySetting.value) !== 'string') {
+          console.error('Recording directory not found');
+          return;
+        }
+
+        const filePath = await path.join(recordingDirectorySetting.value, fileName);
+
+        await invoke<number>('create_recording', {
+          recording: {
+            user_id: user.id,
+            name,
+            status: 'Recording',
+            created_at: new Date().toISOString(),
+            file_path: filePath,
+          },
+        });
+      } catch (error) {
+        console.error('Failed to create recording:', error);
+      }
     }
-};
+  };
 
   const handleStopRecording = async (meetingId: number) => {
     if (user) {
@@ -203,49 +212,148 @@ const Meetings: React.FC = () => {
 
       await invoke('transcribe_recording', { id });
     } catch (error) {
-      console.error('Failed to transcribe recording:', error);
+      showMessage(`${error}`, 'error');
+      setMeetings(prevMeetings =>
+        prevMeetings.map(meeting =>
+          meeting.id === id ? { ...meeting, status: 'Processing_completed' } : meeting
+        )
+      );
     }
   };
   
+  const handleFileUpload = async (name: string) => {
+    try {
+      const selected = await open({
+        multiple: false,
+        filters: [{
+          name: 'Audio',
+          extensions: ['mp3']
+        }]
+      });
+      if (selected === null) {
+        showMessage("Please choose a file", 'error')
+        return;
+      }
+
+      if (Array.isArray(selected)) {
+        showMessage("Please upload 1 file at a time", 'error');
+        return;
+      }
+
+      await invoke<number>('upload_recording', {
+        recording: {
+          user_id: user?.id,
+          file_path: selected,
+          name: name,
+          status: 'Processing_completed',
+          created_at: new Date().toISOString(),
+        }
+      })
+
+      await fetchMeetings();
+      setOpenUploadDialog(false)
+    } catch (error) {
+      showMessage("Failed to upload file", 'error')
+    }
+
+  }
+
   const handleSelectMeeting = (id: number) => {
     navigate(`/meetings/${id}`);
   };
 
+  const sortedAndFilteredMeetings = meetings
+    .filter(meeting =>
+      (filterStatus === '' || meeting.status === filterStatus) &&
+      (filterName === '' || meeting.name.toLowerCase().includes(filterName.toLowerCase()))
+    )
+    .sort((a, b) => {
+      if (sortKey === 'name') {
+        return sortOrder === 'asc' 
+          ? a.name.localeCompare(b.name) 
+          : b.name.localeCompare(a.name);
+      } else {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+    });
+
   return (
     <div>
-      <Box display="flex" justifyContent="flex-end" alignItems="center" p={2}>
-        {recording ? (
-          <>
-            <CircularProgress size={24} sx={{ mr: 1 }} />
-            <Typography variant="body1" sx={{ mr: 2 }}>
-              Recording: {recordingTime}s
-            </Typography>
-            <Button disabled={disableRecordingButton} variant="contained" color="error" onClick={() => handleStopRecording(meetings[meetings.length - 1].id)}>
-              Stop
-            </Button>
-          </>
-        ) : (
+      <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
+        {/* Left Side: Recording Button */}
+        <Box display="flex" alignItems="center">
           <Button
             variant="contained"
-            color="primary"
-            startIcon={<FiberManualRecord />}
-            onClick={handleRecord}
+            color={recording ? "error" : "primary"}
+            startIcon={recording ? <Stop /> : <FiberManualRecord />}
+            onClick={recording ? () => handleStopRecording(meetings[meetings.length - 1].id) : handleRecord}
+            disabled={disableRecordingButton}
+            sx={{ mr: 2 }} // Add right margin for spacing
           >
-            Start Recording
+            {recording ? 'Stop' : 'Record'}
           </Button>
-        )}
+          {recording && (
+            <Typography variant="body2" sx={{ ml: 1 }}>
+              {recordingTime}s
+            </Typography>
+          )}
+          <CloudUpload onClick={handleUpload} />
+        </Box>
+
+        {/* Right Side: Filters and Sorting */}
+        <Box display="flex" alignItems="center">
+          <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            sx={{ mr: 2 }}
+          />
+          <FormControl variant="outlined" size="small" sx={{ mr: 2 }}>
+            <InputLabel htmlFor="sort-key">Sort By</InputLabel>
+            <Select
+              id="sort-key"
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value as 'name' | 'created_at')}
+              label="Sort By"
+            >
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="created_at">Date</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<Sort />}
+            onClick={handleSortToggle}
+            size="small"
+          >
+            {sortOrder === 'asc' ? 'Asc' : 'Desc'}
+          </Button>
+        </Box>
       </Box>
 
+      {/* Meeting List */}
+      <Box p={2}>
+        <MeetingList
+          meetings={sortedAndFilteredMeetings}
+          onTranscribe={handleTranscribe}
+          onSelect={handleSelectMeeting}
+        />
+      </Box>
+
+      {/* Dialog for Starting Recording */}
       <MeetingDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         onStartRecording={handleStartRecording}
       />
-
-      <MeetingList
-        meetings={meetings}
-        onTranscribe={handleTranscribe}
-        onSelect={handleSelectMeeting}
+      <UploadDialog
+        open={openUploadDialog}
+        onClose={() => setOpenUploadDialog(false)}
+        onUpload={handleFileUpload}
       />
     </div>
   );

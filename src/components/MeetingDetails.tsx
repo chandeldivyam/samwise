@@ -10,6 +10,7 @@ interface MeetingDetailsProps {
 }
 
 const MeetingDetails: React.FC<MeetingDetailsProps> = ({ meeting, onClose }) => {
+  console.log("meeting: ", meeting)
   if (!meeting) return null;
 
   return (
@@ -17,7 +18,7 @@ const MeetingDetails: React.FC<MeetingDetailsProps> = ({ meeting, onClose }) => 
       <DialogTitle>{meeting.name}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Created: {moment(meeting.createdAt).fromNow()}
+          Created: {meeting.created_at} {moment(meeting.created_at).fromNow()}
         </Typography>
         {meeting.status === 'Completed' && (
           <>

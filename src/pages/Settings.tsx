@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, TextField, Switch, FormControlLabel, Button, Box, CircularProgress, Alert } from '@mui/material';
+import { Typography, TextField, Switch, FormControlLabel, Button, Box, CircularProgress, Alert, IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { open } from '@tauri-apps/api/dialog';
 import { useGlobalContext } from '../contexts/GlobalContext';
 import { SettingItem, Setting } from '../types/global';
@@ -8,6 +9,7 @@ const Settings: React.FC = () => {
   const { appSettings, updateSettings, loading } = useGlobalContext();
   const [localSettings, setLocalSettings] = useState<Setting[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({});
   const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
 
   useEffect(() => {
@@ -15,6 +17,10 @@ const Settings: React.FC = () => {
       setLocalSettings(appSettings);
     }
   }, [appSettings]);
+
+  const handleTogglePasswordVisibility = (itemId: string) => {
+    setShowPasswords(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
 
   const handleSettingChange = (settingType: string, itemId: string, value: any) => {
     setLocalSettings(prevSettings =>
@@ -101,7 +107,7 @@ const Settings: React.FC = () => {
           {JSON.parse(setting.value).map((item: SettingItem) => (
             item.showInSettings && (
               <Box key={item.id} sx={{ marginBottom: 2 }}>
-                {item.type === 'string' && (
+                {item.type === 'string' && !item.secret && (
                   <TextField
                     fullWidth
                     label={item.title}
@@ -110,6 +116,31 @@ const Settings: React.FC = () => {
                     helperText={errors[item.id] || item.description}
                     error={!!errors[item.id]}
                     required={item.mandatory}
+                  />
+                )}
+                {item.type === 'string' && item.secret && (
+                  <TextField
+                    fullWidth
+                    label={item.title}
+                    type={showPasswords[item.id] ? 'text' : 'password'}
+                    value={item.value}
+                    onChange={(e) => handleSettingChange(setting.setting_type, item.id, e.target.value)}
+                    helperText={errors[item.id] || item.description}
+                    error={!!errors[item.id]}
+                    required={item.mandatory}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => handleTogglePasswordVisibility(item.id)}
+                            edge="end"
+                          >
+                            {showPasswords[item.id] ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 )}
                 {item.type === 'boolean' && (

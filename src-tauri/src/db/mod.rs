@@ -24,7 +24,7 @@ impl AppState {
             .ok_or(anyhow::anyhow!("Failed to get app config directory"))?;
         fs::create_dir_all(&data_dir)?;
         
-        let db_path = data_dir.join("opensam.db");
+        let db_path = data_dir.join("samwise.db");
 
         let conn = Connection::open(db_path)?;
         schema::initialize_database(&conn)?;

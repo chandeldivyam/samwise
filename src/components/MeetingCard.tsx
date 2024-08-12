@@ -20,13 +20,21 @@ interface MeetingCardProps {
 
 const MeetingCard: React.FC<MeetingCardProps> = ({ meeting, onTranscribe, onSelect }) => {
   return (
-    <Card onClick={() => onSelect(meeting.id)}>
+    <Card 
+      onClick={() => onSelect(meeting.id)}
+      sx={{
+        ':hover': {
+          boxShadow: 5, // Enhanced shadow on hover
+          cursor: 'pointer', // Change cursor to pointer on hover
+        },
+      }}
+    >
       <CardContent>
         <Typography variant="h5" component="div">
           {meeting.name}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Created: {moment(meeting.createdAt).fromNow()}
+          Created: {moment(meeting.created_at).fromNow()}
         </Typography>
         <Box display="flex" alignItems="center" mt={1}>
           {meeting.status === 'Recording' && (
@@ -73,13 +81,6 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ meeting, onTranscribe, onSele
             </>
           )}
         </Box>
-        {meeting.status === 'Completed' && (
-          <>
-            <Typography variant="body2" mt={2}>
-              {meeting.summary}
-            </Typography>
-          </>
-        )}
         {meeting.status === 'Processing_completed' && (
           <Button
             variant="outlined"
