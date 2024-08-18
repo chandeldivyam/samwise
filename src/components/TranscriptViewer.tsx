@@ -40,7 +40,9 @@ const TimestampButton = styled('button')(({ theme }) => ({
   },
 }));
 
-const ParagraphBox = styled(Box)<{ isActive: boolean }>(({ theme, isActive }) => ({
+const ParagraphBox = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})<{ isActive: boolean }>(({ theme, isActive }) => ({
   padding: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
   backgroundColor: isActive ? theme.palette.action.selected : 'transparent',

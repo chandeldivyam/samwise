@@ -21,6 +21,7 @@ import { path } from '@tauri-apps/api';
 import { sanitizeFileName } from '../utils/utils';
 import { open } from '@tauri-apps/api/dialog';
 import UploadDialog from '../components/UploadDialog';
+import { playStartSound } from '../utils/meetings';
 
 const Meetings: React.FC = () => {
   const [recording, setRecording] = useState(false);
@@ -75,6 +76,7 @@ const Meetings: React.FC = () => {
         setRecordingTime(prevTime => prevTime + 1);
       }, 1000);
 
+      playStartSound();
       fetchMeetings();
     });
   
@@ -186,6 +188,7 @@ const Meetings: React.FC = () => {
           },
         });
       } catch (error) {
+        showMessage(`Some error occored in starting recording: ${error}`, 'error');
         console.error('Failed to create recording:', error);
       }
     }

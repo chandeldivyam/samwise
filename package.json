@@ -17,6 +17,7 @@
     "@mui/material": "^5.16.6",
     "@tauri-apps/api": "^1",
     "date-fns": "^3.6.0",
+    "fetch": "^1.1.0",
     "lodash": "^4.17.21",
     "markdown-to-jsx": "^7.4.7",
     "moment": "^2.30.1",

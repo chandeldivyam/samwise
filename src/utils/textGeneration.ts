@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { invoke } from "@tauri-apps/api/tauri";
 import { Setting, SettingItem, GeminiChatHistory } from "../types/global";
 import { get } from "lodash";
 
@@ -20,25 +20,14 @@ export async function generateText(
         showMessage("Gemini API Key not found", "error");
         return "";
     }
+
     try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-pro-exp-0801",
-        });
-        const generationConfig = {
-            temperature: 1,
-            topP: 0.95,
-            topK: 64,
+        const result = await invoke<string>("generate_text", {
+            history: history,
             maxOutputTokens: maxOutputTokens,
-        };
-    
-        const chatSession = model.startChat({
-            generationConfig,
-            history,
+            apiKey: apiKey
         });
-        
-        const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-        return result.response.text();
+        return result;
     } catch (error) {
         showMessage(`Error in generating text: ${error}`, "error");
         return "";
