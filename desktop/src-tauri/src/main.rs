@@ -9,6 +9,7 @@ mod server;
 mod setup;
 mod utils;
 use tauri::{Emitter, Manager};
+mod database;
 mod logging;
 
 #[cfg(target_os = "macos")]
@@ -26,6 +27,7 @@ mod gpu_preference;
 #[cfg(target_os = "macos")]
 mod screen_capture_kit;
 
+use database::get_migrations;
 use eyre::{eyre, Result};
 use tauri_plugin_window_state::StateFlags;
 
@@ -52,6 +54,11 @@ fn main() -> Result<()> {
                 .build(),
         )
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations("sqlite:samwise.db", get_migrations())
+                .build(),
+        )
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())

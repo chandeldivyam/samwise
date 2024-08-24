@@ -86,6 +86,9 @@
     "fs:default",
     "fs:allow-exists",
     "deep-link:allow-get-current",
-    "clipboard-manager:allow-write-text"
+    "clipboard-manager:allow-write-text",
+	"sql:allow-load",
+	"sql:allow-execute",
+	"sql:allow-select"
   ]
 }

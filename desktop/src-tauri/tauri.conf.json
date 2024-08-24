@@ -87,6 +87,9 @@
 					"vibe"
 				]
 			}
+		},
+		"sql": {
+			"preload": ["sqlite:samwise.db"]
 		}
 	}
 }
