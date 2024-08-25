@@ -15,3 +15,6 @@ export const segmentModelUrl = 'https://github.com/pengzhendong/pyannote-onnx/ra
 export const videoExtensions = ['mp4', 'mkv', 'avi', 'mov', 'wmv', 'webm']
 export const audioExtensions = ['mp3', 'wav', 'aac', 'flac', 'oga', 'ogg', 'opic', 'opus', 'm4a']
 export const themes = ['light', 'dark']
+
+export const databaseName = 'sqlite:vibe.db'
+export const maxConnections = 5;

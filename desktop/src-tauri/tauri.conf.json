@@ -89,7 +89,7 @@
 			}
 		},
 		"sql": {
-			"preload": ["sqlite:samwise.db"]
+			"preload": ["sqlite:vibe.db"]
 		}
 	}
 }

@@ -56,7 +56,7 @@ fn main() -> Result<()> {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
             tauri_plugin_sql::Builder::default()
-                .add_migrations("sqlite:samwise.db", get_migrations())
+                .add_migrations("sqlite:vibe.db", get_migrations())
                 .build(),
         )
         .plugin(tauri_plugin_deep_link::init())

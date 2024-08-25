@@ -9,7 +9,7 @@ pub fn get_migrations() -> Vec<Migration> {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 file_name VARCHAR(255) NOT NULL,
 				name TEXT NOT NULL,
-                directory TEXT NOT NULL,
+                file_path TEXT NOT NULL,
 				status VARCHAR(55) NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 				updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

@@ -110,5 +110,11 @@
 	"updating-modal-body": "Updating Vibe to version {{version}}",
 	"updating-modal-title": "Updating...",
 	"use-word-timestamps": "Timestamps per each word",
-	"when-completing-transcription": "When completing transcription"
+	"when-completing-transcription": "When completing transcription",
+	"dashboard-title": "Recordings Dashboard",
+	"dashboard-name": "Name",
+	"dashboard-status": "Status",
+	"dashboard-createdAt": "Created At",
+	"dashboard-actions": "Actions",
+	"dashboard-view": "View"
 }

@@ -16,10 +16,12 @@ import ErrorModalWithContext from './components/ErrorModalWithContext'
 import { Toaster } from 'react-hot-toast'
 import { FilesProvider } from './providers/FilesProvider'
 import { ToastProvider } from './providers/Toast'
+import { initializeDatabase } from './lib/database'
 
 export default function App() {
 	const { i18n } = useTranslation()
 	document.body.dir = i18n.dir()
+	initializeDatabase()
 
 	return (
 		// Handle errors before first render

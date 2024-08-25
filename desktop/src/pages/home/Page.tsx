@@ -13,6 +13,8 @@ import * as webviewWindow from '@tauri-apps/api/webviewWindow'
 import AudioDeviceInput from '~/components/AudioDeviceInput'
 import { ReactComponent as FileIcon } from '~/icons/file.svg'
 import { ReactComponent as MicrphoneIcon } from '~/icons/microphone.svg'
+import { ReactComponent as DashboardIcon } from '~/icons/file.svg'
+import Dashboard from './Dashboard'
 
 export default function Home() {
 	const { t } = useTranslation()
@@ -38,6 +40,9 @@ export default function Home() {
 				</a>
 				<a role="tab" onClick={() => vm.setTabIndex(1)} className={cx('tab [--tab-border-color:gray]', vm.tabIndex === 1 && 'tab-active')}>
 					<MicrphoneIcon className="w-[18px] h-[18px]" />
+				</a>
+				<a role="tab" onClick={() => vm.setTabIndex(2)} className={cx('tab [--tab-border-color:gray]', vm.tabIndex === 2 && 'tab-active')}>
+					<DashboardIcon className="w-[18px] h-[18px]" />
 				</a>
 			</div>
 			{vm.tabIndex === 0 && (
@@ -91,7 +96,7 @@ export default function Home() {
 						<div className="">
 							<AudioDeviceInput device={vm.inputDevice} setDevice={vm.setInputDevice} devices={vm.devices} type="input" />
 							<AudioDeviceInput device={vm.outputDevice} setDevice={vm.setOutputDevice} devices={vm.devices} type="output" />
-							<label className="label cursor-pointer mt-2 mb-5">
+							{/* <label className="label cursor-pointer mt-2 mb-5">
 								<span className="label-text">{t('common.save-record-in-documents-folder')}</span>
 								<input
 									type="checkbox"
@@ -99,7 +104,7 @@ export default function Home() {
 									onChange={(e) => vm.preference.setStoreRecordInDocuments(e.target.checked)}
 									checked={vm.preference.storeRecordInDocuments}
 								/>
-							</label>
+							</label> */}
 						</div>
 						{!vm.isRecording && (
 							<button onMouseDown={() => vm.startRecord()} className="btn btn-primary mt-3">
@@ -117,6 +122,10 @@ export default function Home() {
 						)}
 					</div>
 				</>
+			)}
+
+			{vm.tabIndex === 2 && (
+				<Dashboard onRecordingClick={vm.handleRecordingClick} />
 			)}
 		</Layout>
 	)
