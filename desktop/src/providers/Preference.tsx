@@ -45,6 +45,9 @@ export interface Preference {
 	diarizeThreshold: number
 	setDiarizeThreshold: ModifyState<number>
 	setLanguageDirections: () => void
+
+	chatModelOptions: ChatModelOptions
+	setChatModelOptions: ModifyState<ChatModelOptions>
 }
 
 // Create the context
@@ -65,6 +68,13 @@ export interface ModelOptions {
 	max_text_ctx?: number
 	word_timestamps?: boolean
 	max_sentence_len?: number
+}
+
+export interface ChatModelOptions {
+	strategy: string
+	ollama_base_url?: string
+	ollama_model?: string
+	gemini_api_key?: string
 }
 
 const systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -100,6 +110,13 @@ export function PreferenceProvider({ children }: { children: ReactNode }) {
 	const [storeRecordInDocuments, setStoreRecordInDocuments] = useLocalStorage('prefs_store_record_in_documents', true)
 	const [theme, setTheme] = useLocalStorage<'dark' | 'light'>('prefs_theme', systemIsDark ? 'dark' : 'light')
 	const [highGraphicsPreference, setHighGraphicsPreference] = useLocalStorage<boolean>('prefs_high_graphics_performance', false)
+
+	const [chatModelOptions, setChatModelOptions] = useLocalStorage<ChatModelOptions>('prefs_chat_model_args', {
+		strategy: 'ollama',
+		ollama_base_url: 'http://localhost:11434',
+		ollama_model: 'phi3.5',
+		gemini_api_key: '',
+	})
 
 	useEffect(() => {
 		setIsFirstRun(false)
@@ -171,6 +188,8 @@ export function PreferenceProvider({ children }: { children: ReactNode }) {
 		setTheme,
 		gpuDevice,
 		setGpuDevice,
+		chatModelOptions,
+		setChatModelOptions,
 	}
 
 	return <PreferenceContext.Provider value={preference}>{children}</PreferenceContext.Provider>

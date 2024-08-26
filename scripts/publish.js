@@ -7,8 +7,8 @@ import { Glob } from 'bun'
 // Upload specifid file to latest release script
 
 // Github options
-const OWNER = 'thewh1teagle'
-const REPO = 'vibe'
+const OWNER = 'chandeldivyam'
+const REPO = 'samwise'
 const TOKEN = process.env.GH_TOKEN
 const tauriConfPath = path.join(__dirname, '../desktop/src-tauri/tauri.conf.json')
 const TAG = 'v' + (await JSON.parse(await fs.readFile(tauriConfPath)).version)

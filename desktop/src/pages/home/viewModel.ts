@@ -21,6 +21,7 @@ import { useFilesContext } from '~/providers/FilesProvider'
 import { ModelOptions, usePreferenceProvider } from '~/providers/Preference'
 import { UpdaterContext } from '~/providers/Updater'
 import { Recording } from './Dashboard'
+import { Message } from '~/components/Chat'
 
 export interface BatchOptions {
 	files: NamedPath[]
@@ -46,6 +47,9 @@ export function viewModel() {
 	const [devices, setDevices] = useState<AudioDevice[]>([])
 	const [inputDevice, setInputDevice] = useState<AudioDevice | null>(null)
 	const [outputDevice, setOutputDevice] = useState<AudioDevice | null>(null)
+	const [summary, setSummary] = useState<string>('')
+	const [activeTab, setActiveTab] = useState<'transcript' | 'summary' | 'chat'>('transcript')
+	const [messages, setMessages] = useState<Message[]>([]);
 
 	const { updateApp, availableUpdate } = useContext(UpdaterContext)
 	const { setState: setErrorModal } = useContext(ErrorModalContext)
@@ -79,9 +83,10 @@ export function viewModel() {
 			setFiles([{ name, path }])
 			setIsRecording(false)
 			const dbManager = getDbManager();
-			const recording_id = dbManager.insert('recording', {
+			dbManager.insert('recording', {
 				file_name: name,
 				file_path: path,
+				pretty_name: name,
 				status: 'RECORDING_COMPLETED',
 				name: name,
 			});
@@ -127,7 +132,7 @@ export function viewModel() {
 				const existingRecordings = await dbManager.select<{id: number, name: string, transcription: string}>(
 					`SELECT r.id, r.name, ri.transcription 
 					 FROM recording r
-					 LEFT JOIN recording_insights ri ON r.id = ri.recording_id
+					 LEFT JOIN recording_insights ri ON r.file_name = ri.file_name
 					 WHERE r.file_path = :filePath`,
 					{ filePath: file.path }
 				)
@@ -146,6 +151,7 @@ export function viewModel() {
 						file_path: file.path,
 						status: 'RECORDING_COMPLETED',
 						name: file.name,
+						pretty_name: file.name,
 					});
 				}
 			}
@@ -289,8 +295,8 @@ export function viewModel() {
 			  );
 
 			const existingInsights = await dbManager.select<{ id: number }>(
-			  'SELECT id FROM recording_insights WHERE recording_id = :recordingId',
-			  { recordingId }
+			  'SELECT id FROM recording_insights WHERE file_name = :fileName',
+			  { fileName }
 			);
 		
 			const transcriptionText = JSON.stringify(res.segments)
@@ -299,13 +305,13 @@ export function viewModel() {
 			  // Update existing insights
 			  await dbManager.update('recording_insights',
 				{ transcription: transcriptionText },
-				'recording_id = :recordingId',
-				{ recordingId }
+				'file_name = :fileName',
+				{ fileName }
 			  );
 			} else {
 			  // Insert new insights
 			  await dbManager.insert('recording_insights', {
-				recording_id: recordingId,
+				file_name: fileName,
 				transcription: transcriptionText,
 			  });
 			}
@@ -338,17 +344,29 @@ export function viewModel() {
 		setAudio(new Audio(convertFileSrc(recording.file_path)))
 	
 		const dbManager = getDbManager()
-		const [insights] = await dbManager.select<{ transcription: string }>(
-		  'SELECT transcription FROM recording_insights WHERE recording_id = :id',
-		  { id: recording.id }
+		const [insights] = await dbManager.select<{ transcription: string, summary: string }>(
+		  'SELECT transcription, summary FROM recording_insights WHERE file_name = :fileName',
+		  { fileName: recording.name }
 		)
 	
 		if (insights && insights.transcription) {
 		  setSegments(JSON.parse(insights.transcription))
+		  setSummary(insights.summary)
 		} else {
 		  setSegments(null)
 		}
-	  }
+	}
+
+	async function renameRecording(id: number, newName: string) {
+		const dbManager = getDbManager()
+		await dbManager.update(
+		  'recording',
+		  { pretty_name: newName },
+		  'id = :id',
+		  { id }
+		)
+	}
+
 
 	return {
 		devices,
@@ -382,5 +400,12 @@ export function viewModel() {
 		tabIndex,
 		setTabIndex,
 		handleRecordingClick,
+		summary,
+		setSummary,
+		activeTab,
+		setActiveTab,
+		messages, 
+		setMessages,
+		renameRecording,
 	}
 }

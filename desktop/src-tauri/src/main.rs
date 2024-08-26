@@ -56,7 +56,7 @@ fn main() -> Result<()> {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
             tauri_plugin_sql::Builder::default()
-                .add_migrations("sqlite:vibe.db", get_migrations())
+                .add_migrations("sqlite:samwise.db", get_migrations())
                 .build(),
         )
         .plugin(tauri_plugin_deep_link::init())
@@ -88,6 +88,7 @@ fn main() -> Result<()> {
             cmd::get_models_folder,
             cmd::is_portable,
             cmd::get_logs_folder,
+            cmd::chat::process_chat_message,
             #[cfg(windows)]
             cmd::set_high_gpu_preference
         ])

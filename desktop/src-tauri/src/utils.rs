@@ -20,43 +20,9 @@ pub fn get_current_dir() -> Result<PathBuf> {
     Ok(current_dir.to_path_buf())
 }
 
-pub fn get_app_info() -> String {
-    use tauri_plugin_os::{arch, platform, type_, version};
-    let cuda_version = get_cuda_version();
-    let commit = get_commit_hash();
-
-    let arch = arch();
-    let platform = platform();
-    let os_ver = version();
-    let os_type = type_();
-    let models = "List of models"; // Replace with actual models fetching logic
-    let x86_features = get_x86_features(); // Replace with actual x86 features fetching logic
-
-    let info = format!(
-        "Commit Hash: {}\n\
-         Arch: {}\n\
-         Platform: {}\n\
-         OS: {}\n\
-         OS Version: {}\n\
-         Cuda Version: {}\n\
-         Models: {}\n\
-         X86 Features: {}",
-        commit,
-        arch,
-        platform,
-        os_type,
-        os_ver,
-        cuda_version,
-        models,
-        x86_features.unwrap_or_default()
-    );
-
-    info
-}
-
 pub fn get_issue_url(logs: String) -> String {
-    let extra_info = get_app_info();
-    format!("https://github.com/thewh1teagle/vibe/issues/new?assignees=octocat&labels=bug&projects=&template=bug_report.yaml&title=Bug:&logs={}", urlencoding::encode(&format!("{}\n\n{}", extra_info, &logs)))
+    println!("{}", logs);
+    format!("https://github.com/{}/samwise/issues/new", "chandeldivyam")
 }
 
 pub trait LogError<T> {

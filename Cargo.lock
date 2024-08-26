@@ -1556,7 +1556,7 @@ dependencies = [
 [[package]]
 name = "eyre"
 version = "1.0.0"
-source = "git+https://github.com/thewh1teagle/eyre?branch=feat/report-serialize-backtrace#8a0b71c8de62efcab7408fff8e6dc29ba7e5b59a"
+source = "git+https://github.com/chandeldivyam/eyre?branch=feat/report-serialize-backtrace#615e0d1b33aad2f8c20a9cd6efbc90425a1c872f"
 dependencies = [
  "indenter",
  "once_cell",
@@ -4707,6 +4707,70 @@ dependencies = [
 ]
 
 [[package]]
+name = "samwise"
+version = "0.0.6"
+dependencies = [
+ "axum",
+ "chrono",
+ "clap",
+ "cocoa",
+ "cpal",
+ "crash-handler",
+ "env_logger",
+ "eyre 1.0.0",
+ "futures",
+ "hound",
+ "objc_id",
+ "once_cell",
+ "open",
+ "openssl",
+ "rand 0.8.5",
+ "samwise_text",
+ "screencapturekit",
+ "screencapturekit-sys",
+ "serde",
+ "serde_json",
+ "showfile",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-deep-link",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-sql",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "tauri-plugin-window-state",
+ "tokio",
+ "tracing",
+ "tracing-log",
+ "tracing-subscriber",
+ "url",
+ "urlencoding",
+ "utoipa",
+ "utoipa-swagger-ui",
+ "vibe_core",
+ "windows 0.56.0",
+ "winreg 0.52.0",
+]
+
+[[package]]
+name = "samwise_text"
+version = "0.1.0"
+dependencies = [
+ "eyre 1.0.0",
+ "reqwest 0.11.27",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "scc"
 version = "2.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6246,6 +6310,7 @@ dependencies = [
  "bytes",
  "libc",
  "mio",
+ "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
  "socket2",
@@ -6779,57 +6844,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
-name = "vibe"
-version = "0.0.6"
-dependencies = [
- "axum",
- "chrono",
- "clap",
- "cocoa",
- "cpal",
- "crash-handler",
- "env_logger",
- "eyre 1.0.0",
- "futures",
- "hound",
- "objc_id",
- "once_cell",
- "open",
- "openssl",
- "rand 0.8.5",
- "screencapturekit",
- "screencapturekit-sys",
- "serde",
- "serde_json",
- "showfile",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-deep-link",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-sql",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "tauri-plugin-window-state",
- "tokio",
- "tracing",
- "tracing-log",
- "tracing-subscriber",
- "url",
- "urlencoding",
- "utoipa",
- "utoipa-swagger-ui",
- "vibe_core",
- "windows 0.56.0",
- "winreg 0.52.0",
-]
-
-[[package]]
 name = "vibe_core"
 version = "0.0.6"
 dependencies = [
@@ -7125,7 +7139,7 @@ dependencies = [
 [[package]]
 name = "whisper-rs"
 version = "0.13.0"
-source = "git+https://github.com/thewh1teagle/whisper-rs.git?branch=v1.6.3-beta.0#321a80ac86ae3a887a15301085c42440bb3e4a17"
+source = "git+https://github.com/chandeldivyam/whisper-rs.git?branch=v1.6.3-beta.0#bb6e3fa76f26e5ba14bdf8539ee8e1b9bae4db52"
 dependencies = [
  "tracing",
  "whisper-rs-sys",
@@ -7134,7 +7148,7 @@ dependencies = [
 [[package]]
 name = "whisper-rs-sys"
 version = "0.11.0"
-source = "git+https://github.com/thewh1teagle/whisper-rs.git?branch=v1.6.3-beta.0#321a80ac86ae3a887a15301085c42440bb3e4a17"
+source = "git+https://github.com/chandeldivyam/whisper-rs.git?branch=v1.6.3-beta.0#bb6e3fa76f26e5ba14bdf8539ee8e1b9bae4db52"
 dependencies = [
  "bindgen",
  "cfg-if",

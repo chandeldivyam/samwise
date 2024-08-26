@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LanguageInput from '~/components/LanguageInput'
 import Layout from '~/components/Layout'
@@ -15,6 +16,8 @@ import { ReactComponent as FileIcon } from '~/icons/file.svg'
 import { ReactComponent as MicrphoneIcon } from '~/icons/microphone.svg'
 import { ReactComponent as DashboardIcon } from '~/icons/file.svg'
 import Dashboard from './Dashboard'
+import Summary from '~/components/Summary'
+import Chat from '~/components/Chat'
 
 export default function Home() {
 	const { t } = useTranslation()
@@ -50,7 +53,7 @@ export default function Home() {
 					<div className="flex w-[300px] flex-col m-auto">
 						<div className="join join-vertical">
 							<LanguageInput />
-							{!vm.files.length && <AudioInput onClick={vm.selectFiles} />}
+							{!vm.files.length && !vm.isRecording && <AudioInput onClick={vm.selectFiles} />}
 						</div>
 						{vm.audio && (
 							<div>
@@ -58,7 +61,7 @@ export default function Home() {
 									<AudioPlayer label={vm?.files?.[0].name} onLabelClick={() => vm.openPath(vm?.files?.[0])} audio={vm.audio} />
 								) : null}
 
-								{!vm.loading && (
+								{!vm.loading && !vm.isRecording && (
 									<div onMouseDown={vm.selectFiles} className={cx('text-xs text-base-content font-medium cursor-pointer mb-3 mt-1')}>
 										{t('common.change-file')}
 									</div>
@@ -78,6 +81,27 @@ export default function Home() {
 					{vm.loading && <ProgressPanel isAborting={vm.isAborting} onAbort={vm.onAbort} progress={vm.progress} />}
 					{(vm.segments || vm.loading) && (
 						<div className="flex flex-col mt-5 items-center w-[90%] max-w-[1000px] h-[84vh] m-auto">
+							<div className="tabs tabs-boxed mb-4">
+							<a 
+								className={`tab ${vm.activeTab === 'transcript' ? 'tab-active' : ''}`}
+								onClick={() => vm.setActiveTab('transcript')}
+							>
+								{t('common.transcript')}
+							</a>
+							<a 
+								className={`tab ${vm.activeTab === 'summary' ? 'tab-active' : ''}`}
+								onClick={() => vm.setActiveTab('summary')}
+							>
+								{t('common.summary')}
+							</a>
+							<a 
+								className={`tab ${vm.activeTab === 'chat' ? 'tab-active' : ''}`}
+								onClick={() => vm.setActiveTab('chat')}
+								>
+								{t('common.chat')}
+							</a>
+							</div>
+							{vm.activeTab === 'transcript' && (
 							<TextArea
 								setSegments={vm.setSegments}
 								file={vm.files?.[0]}
@@ -85,6 +109,22 @@ export default function Home() {
 								segments={vm.segments}
 								readonly={vm.loading}
 							/>
+							)}
+							{vm.activeTab === 'summary' && (
+								<Summary 
+									summary={vm.summary} 
+									loading={vm.loading} 
+									setSummary={vm.setSummary} 
+									segments={vm.segments}
+								/>
+							)}
+							{vm.activeTab === 'chat' && (
+								<Chat 
+									segments={vm.segments} 
+									messages={vm.messages}
+									setMessages={vm.setMessages}
+								/>
+							)}
 						</div>
 					)}
 				</>
@@ -125,7 +165,10 @@ export default function Home() {
 			)}
 
 			{vm.tabIndex === 2 && (
-				<Dashboard onRecordingClick={vm.handleRecordingClick} />
+				<Dashboard 
+					onRecordingClick={vm.handleRecordingClick}
+					onRenameRecording={vm.renameRecording}
+				/>
 			)}
 		</Layout>
 	)

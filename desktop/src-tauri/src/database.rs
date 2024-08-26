@@ -7,7 +7,8 @@ pub fn get_migrations() -> Vec<Migration> {
             description: "create_recording_table",
             sql: "CREATE TABLE recording (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                file_name VARCHAR(255) NOT NULL,
+                file_name VARCHAR(255) NOT NULL UNIQUE,
+				pretty_name TEXT,
 				name TEXT NOT NULL,
                 file_path TEXT NOT NULL,
 				status VARCHAR(55) NOT NULL,
@@ -21,12 +22,12 @@ pub fn get_migrations() -> Vec<Migration> {
             description: "create_recording_insights_table",
             sql: "CREATE TABLE recording_insights (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                recording_id INTEGER NOT NULL,
+                file_name VARCHAR(255) NOT NULL,
                 transcription TEXT,
                 summary TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (recording_id) REFERENCES recording(id)
+                FOREIGN KEY (file_name) REFERENCES recording(file_name)
             );",
             kind: MigrationKind::Up,
         },

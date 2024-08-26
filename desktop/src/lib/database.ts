@@ -21,7 +21,7 @@ export class DatabaseManager {
     }
 
     async initialize(
-        dbPath: string = databaseName || "sqlite:vibe.db",
+        dbPath: string = databaseName || "sqlite:samwise.db",
     ): Promise<void> {
         if (this.initialized) {
             console.log("Database already initialized");
