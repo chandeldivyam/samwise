@@ -8,7 +8,7 @@ pub fn register() -> Result<()> {
     let classes = hkcu.open_subkey_with_flags("Software\\Classes", KEY_ALL_ACCESS)?;
 
     // Create the main key for the protocol handler
-    let app_class = classes.create_subkey("vibe")?;
+    let app_class = classes.create_subkey("samwise")?;
     app_class.0.set_value("URL Protocol", &"")?;
 
     // Create the necessary subkeys: shell, open, command

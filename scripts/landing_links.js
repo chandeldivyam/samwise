@@ -2,8 +2,8 @@ import path from 'path'
 import fs from 'fs/promises'
 
 const RELEASES_PATH = path.resolve(__dirname, '../landing/src/lib/latest_release.json')
-const OWNER = 'thewh1teagle'
-const REPO = 'vibe'
+const OWNER = 'chandeldivyam'
+const REPO = 'samwise'
 const BLACKLIST_PATTERNS = ['opencl', 'nvidia', 'older', '.rpm', 'portable', 'cuda', 'ubuntu', 'setup_']
 
 function getAssetInfo(name) {

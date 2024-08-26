@@ -14,6 +14,7 @@ import { ReactComponent as CopyIcon } from '~/icons/copy.svg'
 
 import * as config from '~/lib/config'
 import { supportedLanguages } from '~/lib/i18n'
+import { supportedChatStrategies } from '~/lib/config'
 import { ModifyState, cx } from '~/lib/utils'
 import { viewModel } from './viewModel'
 import * as os from '@tauri-apps/plugin-os'
@@ -81,6 +82,84 @@ export default function SettingsPage({ setVisible }: SettingsPageProps) {
 					))}
 				</select>
 			</label>
+
+			<div className="label mt-10">
+				<span className="label-text">{t('common.chat_model_settings')}</span>
+			</div>
+
+			<div className="flex flex-col gap-1">
+				<label className="form-control w-full">
+					<div className="label">
+					<span className="label-text flex items-center gap-1">
+						<InfoTooltip text={t('common.chat_strategy_info')} />
+						{t('common.chat_strategy')}
+					</span>
+					</div>
+					<select
+					onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, strategy: e.target.value})}
+					value={vm.preference.chatModelOptions.strategy}
+					className="select select-bordered capitalize">
+					{supportedChatStrategies.map((strategy) => (
+						<option key={strategy} value={strategy}>
+						{strategy}
+						</option>
+					))}
+					</select>
+				</label>
+
+				{vm.preference.chatModelOptions.strategy === 'ollama' && (
+					<>
+					<label className="form-control w-full">
+						<div className="label">
+						<span className="label-text flex items-center gap-1">
+							<InfoTooltip text={t('common.ollama_base_url_info')} />
+							{t('common.ollama_base_url')}
+						</span>
+						</div>
+						<input
+						type="text"
+						className="input input-bordered"
+						value={vm.preference.chatModelOptions.ollama_base_url}
+						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, ollama_base_url: e.target.value})}
+						placeholder="http://localhost:11434"
+						/>
+					</label>
+					<label className="form-control w-full">
+						<div className="label">
+						<span className="label-text flex items-center gap-1">
+							<InfoTooltip text={t('common.ollama_model_info')} />
+							{t('common.ollama_model')}
+						</span>
+						</div>
+						<input
+						type="text"
+						className="input input-bordered"
+						value={vm.preference.chatModelOptions.ollama_model}
+						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, ollama_model: e.target.value})}
+						placeholder="phi3.5"
+						/>
+					</label>
+					</>
+				)}
+
+				{vm.preference.chatModelOptions.strategy === 'gemini' && (
+					<label className="form-control w-full">
+					<div className="label">
+						<span className="label-text flex items-center gap-1">
+						<InfoTooltip text={t('common.gemini_api_key_info')} />
+						{t('common.gemini_api_key')}
+						</span>
+					</div>
+					<input
+						type="password"
+						className="input input-bordered"
+						value={vm.preference.chatModelOptions.gemini_api_key}
+						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, gemini_api_key: e.target.value})}
+						placeholder="Your Gemini API Key"
+					/>
+					</label>
+				)}
+			</div>
 
 			<div className="label mt-5">
 				<span className="label-text opacity-60">{t('common.when-completing-transcription')}</span>
@@ -161,29 +240,6 @@ export default function SettingsPage({ setVisible }: SettingsPageProps) {
 				<button onMouseDown={vm.openModelsUrl} className="btn bg-base-300 text-base-content">
 					{t('common.download-models-link')}
 					<LinkIcon className="w-4 h-4" />
-				</button>
-			</div>
-
-			<div className="label mt-10">
-				<span className="label-text">{t('common.general')}</span>
-			</div>
-
-			<div className="flex flex-col gap-1">
-				<button onMouseDown={() => shell.open(config.aboutURL)} className="btn bg-base-300 text-base-content">
-					{t('common.project-link')}
-					<LinkIcon className="w-4 h-4" />
-				</button>
-				<button onMouseDown={vm.reportIssue} className="btn bg-base-300 text-base-content">
-					{t('common.report-issue')}
-					<GithubIcon className="w-4 h-4" />
-				</button>
-				<button onMouseDown={() => shell.open(config.supportVibeURL)} className="btn bg-base-300 text-base-content">
-					{t('common.support-the-project')}
-					<HeartIcon fill="#db61a2" className="w-4 h-4 stroke-2" />
-				</button>
-				<button onMouseDown={() => shell.open(config.discordURL)} className="btn bg-base-300 text-base-content">
-					{t('common.discord-community')}
-					<DiscordIcon className="w-4 h-4" />
 				</button>
 			</div>
 

@@ -14,11 +14,14 @@ import { AudioDevice } from '~/lib/audio'
 import * as config from '~/lib/config'
 import * as transcript from '~/lib/transcript'
 import { NamedPath, ls, openPath, pathToNamedPath } from '~/lib/utils'
+import { getDbManager } from '~/lib/database' 
 import { getX86Features } from '~/lib/x86Features'
 import { ErrorModalContext } from '~/providers/ErrorModal'
 import { useFilesContext } from '~/providers/FilesProvider'
 import { ModelOptions, usePreferenceProvider } from '~/providers/Preference'
 import { UpdaterContext } from '~/providers/Updater'
+import { Recording } from './Dashboard'
+import { Message } from '~/components/Chat'
 
 export interface BatchOptions {
 	files: NamedPath[]
@@ -44,6 +47,9 @@ export function viewModel() {
 	const [devices, setDevices] = useState<AudioDevice[]>([])
 	const [inputDevice, setInputDevice] = useState<AudioDevice | null>(null)
 	const [outputDevice, setOutputDevice] = useState<AudioDevice | null>(null)
+	const [summary, setSummary] = useState<string>('')
+	const [activeTab, setActiveTab] = useState<'transcript' | 'summary' | 'chat'>('transcript')
+	const [messages, setMessages] = useState<Message[]>([]);
 
 	const { updateApp, availableUpdate } = useContext(UpdaterContext)
 	const { setState: setErrorModal } = useContext(ErrorModalContext)
@@ -76,6 +82,14 @@ export function viewModel() {
 			setTabIndex(0)
 			setFiles([{ name, path }])
 			setIsRecording(false)
+			const dbManager = getDbManager();
+			dbManager.insert('recording', {
+				file_name: name,
+				file_path: path,
+				pretty_name: name,
+				status: 'RECORDING_COMPLETED',
+				name: name,
+			});
 		})
 	}
 
@@ -110,8 +124,36 @@ export function viewModel() {
 		})
 		if (selected) {
 			const newFiles: NamedPath[] = []
+			const dbManager = getDbManager()
 			for (const file of selected) {
 				newFiles.push({ name: file.name ?? '', path: file.path })
+
+				// We need to check if the filepath already exists in file_path in db
+				const existingRecordings = await dbManager.select<{id: number, name: string, transcription: string}>(
+					`SELECT r.id, r.name, ri.transcription 
+					 FROM recording r
+					 LEFT JOIN recording_insights ri ON r.file_name = ri.file_name
+					 WHERE r.file_path = :filePath`,
+					{ filePath: file.path }
+				)
+
+				if(Array.isArray(existingRecordings) && existingRecordings.length > 0 && existingRecordings[0].transcription) {
+					try{	
+						if (existingRecordings[0].transcription) setSegments(JSON.parse(existingRecordings[0].transcription))
+					}
+					catch{
+						continue;
+					}
+				}
+				else {
+					dbManager.insert('recording', {
+						file_name: file.name ?? '',
+						file_path: file.path,
+						status: 'RECORDING_COMPLETED',
+						name: file.name,
+						pretty_name: file.name,
+					});
+				}
 			}
 			setFiles(newFiles)
 
@@ -211,7 +253,7 @@ export function viewModel() {
 		setSegments(null)
 		setLoading(true)
 		abortRef.current = false
-
+		let res: transcript.Transcript;
 		try {
 			await invoke('load_model', { modelPath: preference.modelPath, gpuDevice: preference.gpuDevice })
 			const options = {
@@ -220,7 +262,7 @@ export function viewModel() {
 			}
 			const startTime = performance.now()
 			const diarizeOptions = { threshold: preference.diarizeThreshold, max_speakers: preference.maxSpeakers, enabled: preference.recognizeSpeakers }
-			const res: transcript.Transcript = await invoke('transcribe', {
+			res = await invoke('transcribe', {
 				options,
 				modelPath: preference.modelPath,
 				diarizeOptions,
@@ -231,6 +273,48 @@ export function viewModel() {
 			console.info(`Transcribe took ${total} seconds.`)
 
 			setSegments(res.segments)
+			// Store or update transcription in the database
+			const dbManager = getDbManager();
+			const fileName = files[0].name;
+			
+			// Check if a recording with this file name already exists
+			const existingRecordings = await dbManager.select<{ id: number, status: string }>(
+			  'SELECT id, status FROM recording WHERE file_name = :fileName',
+			  { fileName }
+			);
+		
+			if (!Array.isArray(existingRecordings) || existingRecordings.length === 0){
+				return;
+			}
+			// Check if insights already exist for this recording
+			let recordingId: number = existingRecordings[0].id;
+			  await dbManager.update('recording', 
+				{ status: 'TRANSCRIPTION_COMPLETED' },
+				'id = :id',
+				{ id: recordingId }
+			  );
+
+			const existingInsights = await dbManager.select<{ id: number }>(
+			  'SELECT id FROM recording_insights WHERE file_name = :fileName',
+			  { fileName }
+			);
+		
+			const transcriptionText = JSON.stringify(res.segments)
+		
+			if (existingInsights.length > 0) {
+			  // Update existing insights
+			  await dbManager.update('recording_insights',
+				{ transcription: transcriptionText },
+				'file_name = :fileName',
+				{ fileName }
+			  );
+			} else {
+			  // Insert new insights
+			  await dbManager.insert('recording_insights', {
+				file_name: fileName,
+				transcription: transcriptionText,
+			  });
+			}
 		} catch (error) {
 			if (!abortRef.current) {
 				console.error('error: ', error)
@@ -253,6 +337,36 @@ export function viewModel() {
 			}
 		}
 	}
+
+	async function handleRecordingClick(recording: Recording) {
+		setTabIndex(0)
+		setFiles([{ name: recording.name, path: recording.file_path }])
+		setAudio(new Audio(convertFileSrc(recording.file_path)))
+	
+		const dbManager = getDbManager()
+		const [insights] = await dbManager.select<{ transcription: string, summary: string }>(
+		  'SELECT transcription, summary FROM recording_insights WHERE file_name = :fileName',
+		  { fileName: recording.name }
+		)
+	
+		if (insights && insights.transcription) {
+		  setSegments(JSON.parse(insights.transcription))
+		  setSummary(insights.summary)
+		} else {
+		  setSegments(null)
+		}
+	}
+
+	async function renameRecording(id: number, newName: string) {
+		const dbManager = getDbManager()
+		await dbManager.update(
+		  'recording',
+		  { pretty_name: newName },
+		  'id = :id',
+		  { id }
+		)
+	}
+
 
 	return {
 		devices,
@@ -285,5 +399,13 @@ export function viewModel() {
 		onAbort,
 		tabIndex,
 		setTabIndex,
+		handleRecordingClick,
+		summary,
+		setSummary,
+		activeTab,
+		setActiveTab,
+		messages, 
+		setMessages,
+		renameRecording,
 	}
 }

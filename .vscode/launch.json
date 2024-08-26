@@ -26,15 +26,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'vibe'",
+            "name": "Debug executable 'samwise'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=vibe",
-                    "--package=vibe"
+                    "--bin=samwise",
+                    "--package=samwise"
                 ],
                 "filter": {
-                    "name": "vibe",
+                    "name": "samwise",
                     "kind": "bin"
                 }
             },
@@ -44,16 +44,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'vibe' in Release mode",
+            "name": "Debug executable 'samwise' in Release mode",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=vibe",
-                    "--package=vibe",
+                    "--bin=samwise",
+                    "--package=samwise",
                     "--release"
                 ],
                 "filter": {
-                    "name": "vibe",
+                    "name": "samwise",
                     "kind": "bin"
                 },
                 "env": {
@@ -71,16 +71,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'vibe'",
+            "name": "Debug unit tests in executable 'samwise'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=vibe",
-                    "--package=vibe"
+                    "--bin=samwise",
+                    "--package=samwise"
                 ],
                 "filter": {
-                    "name": "vibe",
+                    "name": "samwise",
                     "kind": "bin"
                 }
             },

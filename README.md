@@ -1,122 +1,108 @@
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/3726cd5d-d308-404c-a084-5f6698761c80" alt="Samwise Banner" width="100%">
+</div>
+
+<h1 align="center">Samwise</h1>
+
+<h3 align="center">
+  Think Clearly. Communicate Effectively.
+</h3>
+
 <p align="center">
-  <a target="blank" href="https://github.com/thewh1teagle/vibe">
-    <img
-        width="96px"
-        alt="Vibe logo"
-        src="./design/logo.png"
-    />
+Samwise helps you unlock the power of clear thinking and impactful communication.
+</p>
+
+<div align="center">
+  <a href="https://discord.gg/XbFpSsxGhG">
+    <img src="https://img.shields.io/discord/1273371891762987038?color=7289DA&logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord server">
   </a>
-</p>
+</div>
 
-<h1 align="center">Vibe - Transcribe on your own!</h1>
+---
 
-<p align="center">
-  <strong>⌨️ Transcribe audio / video offline using OpenAI Whisper</strong>
-  <br/>
-</p>
+## **Unlock Your Potential with Samwise**
 
-<p align="center">
-  <a target="_blank" href="https://thewh1teagle.github.io/vibe/">
-    🔗 Download Vibe
-  </a>
-    &nbsp; | &nbsp; Give it a Star ⭐ | &nbsp;
-    <a target="_blank" href="https://ko-fi.com/thewh1teagle">Support the project 🤝</a>
-</p>
+Samwise is an open-source project leveraging the power of Rust and web technologies through [Tauri](https://tauri.app/). We're building a secure, lightweight, and fast application that will revolutionize the way you think, communicate, and interact.
 
-<hr />
+**Imagine:**
 
-## Screenshots
+-   **Effortlessly capturing and distilling the essence of your meetings:** Record locally, generate AI-powered transcripts, and engage in insightful conversations with an AI assistant that understands the context. Summarize key takeaways, organize action items, and connect related meetings to build a comprehensive understanding of your discussions.
 
-<p align="center">
-	<a target="_blank" href="https://thewh1teagle.github.io/vibe/">
-    	<img width=600 src="https://github.com/thewh1teagle/vibe/assets/61390950/22779ac6-9e49-4c21-b528-29647f039da2">
-	</a>
-</p>
+-   **Communicating with Confidence and Clarity:** Receive real-time feedback on your communication style, identify areas for improvement, and practice crucial conversations with AI-powered role-play scenarios. Step into any interaction with the assurance of clear and effective communication.
 
-# Features 🌟
+-   **Gaining Personalized Insights:** Uncover deeper understanding of your communication patterns and receive tailored recommendations for maximizing your impact. Harness the power of data to become a more persuasive and influential communicator.
 
--   🌍 Transcribe almost every language
--   🔒 Ultimate privacy: fully offline transcription, no data ever leaves your device
--   🎨 User friendly design
--   🎙️ Transcribe audio / video
--   📂 Batch transcribe multiple files!
--   📝 Support `SRT`, `VTT`, `TXT`, `HTML`, `PDF`, `JSON` formats
--   👀 Realtime preview
--   🌐 Translate to English from any language
--   🖨️ Print transcript directly to any printer
--   🔄 Automatic updates
--   💻 Optimized for `GPU` (`macOS`, `Windows`, `Linux`)
--   🎮 Optimized for `Nvidia` / `AMD` / `Intel` GPUs! (`Vulkan`/`CoreML`)
--   🔧 Total Freedom: Customize Models Easily via Settings
--   ⚙️ Model arguments for advanced users
--   ⏳ Transcribe system audio
--   🎤 Transcribe from microphone
--   🖥️ CLI support: Use Vibe directly from the command line interface! (see `--help`)
--   👥 Speaker diarization
--   📱 ~iOS & Android support~ (coming soon)
--   📥 Integrate custom models from your own site: Use `vibe://download/?url=<model url>`
--   📹 Choose caption length optimized for videos / reels
--   ⚡ HTTP API with Swagger docs! (use `--server` and open `http://<host>:3022/docs` for docs)
+**Samwise is built on the principle of First Principles Thinking.** We believe in breaking down complex problems into their fundamental truths and building solutions from the ground up. This allows us to create tools that are truly innovative and impactful.
 
-# Supported platforms 🖥️
+## **Getting Started**
 
-`MacOS`
-`Windows`
-`Linux`
+**Prerequisites:**
 
-# Install notes
+-   [Rust](https://www.rust-lang.org/tools/install) (Installation instructions: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
+-   Follow the [Tauri Setup Guide](https://tauri.app/v1/guides/getting-started/setup/) to install additional dependencies.
 
-See [Install.md](INSTALL.md)
+**Steps:**
 
-# Contribute 🤝
+1. **Clone the repository:** `git clone git@github.com:chandeldivyam/samwise.git && cd samwise`
+2. **Install dependencies (using npm, yarn, or pnpm):** `npm install` or `yarn install` or `pnpm install`
+3. **Run in development mode:** `yarn tauri dev` or `npm run tauri dev`
+4. **Build for distribution:** `yarn tauri build` or `npm run tauri build` (executable will be in `src-tauri/target/release`)
 
-PRs are welcomed!
-In addition, you're welcome to add translations.
+## **Using Samwise**
 
-We would like to express our sincere gratitude to all the contributors.
+Samwise is currently under active development, focusing initially on empowering your meeting workflows.
 
-<a href="https://github.com/thewh1teagle/vibe/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=thewh1teagle/vibe" />
-</a>
+**Key Features:**
 
-# Community
+-   **Local Meeting Recording:** Securely record your meetings without relying on third-party platforms.
+-   **AI-Powered Transcriptions:** Generate accurate transcripts to easily review and analyze your discussions.
+-   **Intelligent Chat Assistant:** Engage in insightful conversations with an AI assistant that understands the context of your meetings.
 
-[![Discord](https://img.shields.io/badge/chat-discord-7289da.svg)](https://discord.gg/EcxWSstQN8)
+## **Roadmap**
 
-# Roadmap 🛣️
+**Meeting Note Taking:**
 
-You can see the roadmap in [Vibe-Roadmap](https://github.com/users/thewh1teagle/projects/5/views/1)
+-   **Recording & Transcription:**
+    -   [x] Local Meeting Recording
+    -   [x] API-Based Transcription
+    -   [x] Local Model Transcription
+    -   [ ] Pause/Continue Function
+-   **AI Interaction:**
+    -   [x] API-Based LLM Chat
+    -   [x] Local Model Chat (Ollama)
+    -   [ ] Local Model Chat (Native)
+-   **Enhancements:**
+    -   [x] Data Localization
+    -   [ ] Summary Enhancements
+    -   [ ] Structural Organization
+    -   [ ] Meeting Linkage
 
-# Add translation 🌐
+**Communication Enhancements:**
 
-1. Copy `en` from `desktop/src-tauri/locales` folder to new directory eg `pt-BR` (use [bcp47 language code](https://gist.github.com/thewh1teagle/c8877e5c4c5e2780754ddd065ae2592e))
-2. Change every value in the files there, to the new language and keep the keys as is
-3. create PR / issue in Github
+-   **Real-time Assistance:**
+    -   [ ] Real-time Transcription
+    -   [ ] Real-time Communication Feedback
+    -   [ ] Real-time Content Helper
+-   **Post-Conversation Analysis:**
+    -   [ ] Post-Conversation Insights
+    -   [ ] Enhanced Post-Meeting Insights
+-   **Practice & Development:**
+    -   [ ] Role-Play Conversations
 
-In addition you can add translation to [Vibe website](https://thewh1teagle.github.io/vibe/) by creating new files in the `landing/static/locales`.
+**Application:**
 
-# Build 🛠️
+-   **Distribution:**
+    -   [x] Windows Application Binary
+    -   [x] MacOS Application Binary
+-   **Local AI:**
+    -   [ ] Local Models Deployment
 
-see [BUILDING.md](BUILDING.md)
+## **Download & Contribution**
 
-# I want to know more!
-
-Medium [post](https://medium.com/@thewh1teagle/creating-vibe-multilingual-audio-transcription-872ab6d9dbb0)
-
-# Issue report
-
-You can open [new issue](https://github.com/thewh1teagle/vibe/issues/new?assignees=octocat&labels=bug&projects=&template=bug_report.yaml&title=%5BBug%5D%3A+) and it's recommend to check [DEBUG.md](DEBUG.md) first.
+Samwise is in active development. Join our [Discord community](https://discord.gg/XbFpSsxGhG) for the latest Windows binary, to contribute to the project, and to shape the future of communication!
 
 # Credits
 
-Thanks for [tauri.app](https://tauri.app/) for making the best apps framework I ever seen
+Thank you [thewh1teagle](https://github.com/thewh1teagle) for extremely solid beginning.
 
-Thanks for [wang-bin/avbuild](https://github.com/wang-bin/avbuild) for pre built `ffmpeg`
-
-Thanks for [github.com/whisper.cpp](https://github.com/ggerganov/whisper.cpp) for outstanding interface for the AI model.
-
-Thanks for [openai.com](https://openai.com/) for their amazing [Whisper model](https://openai.com/research/whisper)
-
-Thanks for [github.com](https://github.com/) for their support in open source projects, providing infastructure completly free.
-
-And for all the amazing open source frameworks and libraries which this project uses...
+[Anyone who comes here please show them support ❤️](https://github.com/sponsors/thewh1teagle)
