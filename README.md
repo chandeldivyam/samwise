@@ -26,11 +26,11 @@ Samwise is an open-source project leveraging the power of Rust and web technolog
 
 **Imagine:**
 
-* **Effortlessly capturing and distilling the essence of your meetings:** Record locally, generate AI-powered transcripts, and engage in insightful conversations with an AI assistant that understands the context. Summarize key takeaways, organize action items, and connect related meetings to build a comprehensive understanding of your discussions.
+-   **Effortlessly capturing and distilling the essence of your meetings:** Record locally, generate AI-powered transcripts, and engage in insightful conversations with an AI assistant that understands the context. Summarize key takeaways, organize action items, and connect related meetings to build a comprehensive understanding of your discussions.
 
-* **Communicating with Confidence and Clarity:** Receive real-time feedback on your communication style, identify areas for improvement, and practice crucial conversations with AI-powered role-play scenarios. Step into any interaction with the assurance of clear and effective communication.
+-   **Communicating with Confidence and Clarity:** Receive real-time feedback on your communication style, identify areas for improvement, and practice crucial conversations with AI-powered role-play scenarios. Step into any interaction with the assurance of clear and effective communication.
 
-* **Gaining Personalized Insights:** Uncover deeper understanding of your communication patterns and receive tailored recommendations for maximizing your impact. Harness the power of data to become a more persuasive and influential communicator.
+-   **Gaining Personalized Insights:** Uncover deeper understanding of your communication patterns and receive tailored recommendations for maximizing your impact. Harness the power of data to become a more persuasive and influential communicator.
 
 **Samwise is built on the principle of First Principles Thinking.** We believe in breaking down complex problems into their fundamental truths and building solutions from the ground up. This allows us to create tools that are truly innovative and impactful.
 
@@ -38,8 +38,8 @@ Samwise is an open-source project leveraging the power of Rust and web technolog
 
 **Prerequisites:**
 
-* [Rust](https://www.rust-lang.org/tools/install) (Installation instructions: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
-* Follow the [Tauri Setup Guide](https://tauri.app/v1/guides/getting-started/setup/) to install additional dependencies.
+-   [Rust](https://www.rust-lang.org/tools/install) (Installation instructions: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
+-   Follow the [Tauri Setup Guide](https://tauri.app/v1/guides/getting-started/setup/) to install additional dependencies.
 
 **Steps:**
 
@@ -54,49 +54,55 @@ Samwise is currently under active development, focusing initially on empowering 
 
 **Key Features:**
 
-* **Local Meeting Recording:** Securely record your meetings without relying on third-party platforms.
-* **AI-Powered Transcriptions:** Generate accurate transcripts to easily review and analyze your discussions.
-* **Intelligent Chat Assistant:** Engage in insightful conversations with an AI assistant that understands the context of your meetings.
+-   **Local Meeting Recording:** Securely record your meetings without relying on third-party platforms.
+-   **AI-Powered Transcriptions:** Generate accurate transcripts to easily review and analyze your discussions.
+-   **Intelligent Chat Assistant:** Engage in insightful conversations with an AI assistant that understands the context of your meetings.
 
 ## **Roadmap**
 
 **Meeting Note Taking:**
 
-* **Recording & Transcription:**
-    * [x] Local Meeting Recording
-    * [x] API-Based Transcription
-    * [ ] Local Model Transcription
-    * [ ] Pause/Continue Function
-* **AI Interaction:**
-    * [x] API-Based LLM Chat
-    * [ ] Local Model Chat
-* **Enhancements:**
-    * [ ] Data Localization
-    * [ ] Summary Enhancements
-    * [ ] Structural Organization
-    * [ ] Meeting Linkage
-
+-   **Recording & Transcription:**
+    -   [x] Local Meeting Recording
+    -   [x] API-Based Transcription
+    -   [x] Local Model Transcription
+    -   [ ] Pause/Continue Function
+-   **AI Interaction:**
+    -   [x] API-Based LLM Chat
+    -   [x] Local Model Chat (Ollama)
+    -   [ ] Local Model Chat (Native)
+-   **Enhancements:**
+    -   [x] Data Localization
+    -   [ ] Summary Enhancements
+    -   [ ] Structural Organization
+    -   [ ] Meeting Linkage
 
 **Communication Enhancements:**
 
-* **Real-time Assistance:**
-    * [ ] Real-time Transcription
-    * [ ] Real-time Communication Feedback
-    * [ ] Real-time Content Helper
-* **Post-Conversation Analysis:**
-    * [ ] Post-Conversation Insights
-    * [ ] Enhanced Post-Meeting Insights
-* **Practice & Development:**
-    * [ ] Role-Play Conversations
+-   **Real-time Assistance:**
+    -   [ ] Real-time Transcription
+    -   [ ] Real-time Communication Feedback
+    -   [ ] Real-time Content Helper
+-   **Post-Conversation Analysis:**
+    -   [ ] Post-Conversation Insights
+    -   [ ] Enhanced Post-Meeting Insights
+-   **Practice & Development:**
+    -   [ ] Role-Play Conversations
 
 **Application:**
 
-* **Distribution:**
-    * [x] Windows Application Binary
-    * [ ] MacOS Application Binary
-* **Local AI:**
-    * [ ] Local Models Deployment
+-   **Distribution:**
+    -   [x] Windows Application Binary
+    -   [x] MacOS Application Binary
+-   **Local AI:**
+    -   [ ] Local Models Deployment
 
 ## **Download & Contribution**
 
 Samwise is in active development. Join our [Discord community](https://discord.gg/XbFpSsxGhG) for the latest Windows binary, to contribute to the project, and to shape the future of communication!
+
+# Credits
+
+Thank you [thewh1teagle](https://github.com/thewh1teagle) for extremely solid beginning.
+
+[Anyone who comes here please show them support ❤️](https://github.com/sponsors/thewh1teagle)
