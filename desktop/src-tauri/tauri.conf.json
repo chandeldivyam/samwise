@@ -1,0 +1,95 @@
+{
+	"$schema": "./gen/schemas/desktop-schema.json",
+	"productName": "samwise",
+	"version": "0.0.1",
+	"identifier": "samwise.tech",
+	"app": {
+		"windows": [],
+		"withGlobalTauri": true,
+		"security": {
+			"assetProtocol": {
+				"scope": {
+					"allow": [
+						"**"
+					],
+					"deny": [],
+					"requireLiteralLeadingDot": false
+				},
+				"enable": true
+			},
+			"csp": null
+		}
+	},
+	"build": {
+		"beforeDevCommand": "bun run dev",
+		"beforeBuildCommand": "bun run build",
+		"frontendDist": "../dist",
+		"devUrl": "http://localhost:1420"
+	},
+	"bundle": {
+		"active": true,
+		"targets": [
+			"nsis",
+			"deb",
+			"rpm",
+			"dmg",
+			"app"
+		],
+		"createUpdaterArtifacts": true,
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		],
+		"resources": {
+			"locales": "locales"
+		},
+		"fileAssociations": [
+			{
+				"description": "Video files",
+				"ext": [
+					"mp4",
+					"mkv",
+					"avi",
+					"mov",
+					"wmv",
+					"webm"
+				]
+			},
+			{
+				"description": "Audio files",
+				"ext": [
+					"mp3",
+					"wav",
+					"aac",
+					"flac",
+					"oga",
+					"ogg",
+					"opic",
+					"opus"
+				]
+			}
+		]
+	},
+	"plugins": {
+		"updater": {
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg0QUM2MDYxODM3OThDMDYKUldRR2pIbURZV0NzaEZrNmhBbnZSQXF6MzJJTmpwc0RBZ0REeElUSm9xMFRYcWxMUVVaNXVaaUwK",
+			"endpoints": [
+				"https://github.com/chandeldivyam/samwise/releases/latest/download/latest.json"
+			]
+		},
+		"deep-link": {
+			"mobile": [],
+			"desktop": {
+				"schemes": [
+					"samwise"
+				]
+			}
+		},
+		"sql": {
+			"preload": ["sqlite:samwise.db"]
+		}
+	}
+}

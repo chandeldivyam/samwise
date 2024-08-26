@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html {
+		font-family: 'Proxima Nova', system-ui, sans-serif;
+	}
+}
+
+[dir='rtl'] select {
+	padding-right: 10px;
+	padding-left: 42px;
+}
+
+@media print {
+	body * {
+		visibility: hidden;
+	}
+
+	.printable {
+		visibility: visible;
+	}
+
+	.printable * {
+		visibility: visible;
+	}
+
+	.html {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 100vh;
+	}
+}
