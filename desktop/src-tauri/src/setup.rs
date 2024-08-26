@@ -1,5 +1,5 @@
 use crate::{
-    cli,
+    cli::{self, is_cli_detected},
     config::STORE_FILENAME,
     panic_hook,
     utils::{get_issue_url, LogError},
@@ -102,14 +102,17 @@ pub fn setup(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(not(all(any(target_arch = "x86", target_arch = "x86_64"), target_os = "windows")))]
     tracing::debug!("CPU feature detection is not supported on this architecture.");
 
-    tracing::debug!("COMMIT_HASH: {}", env!("COMMIT_HASH"));
+    tracing::debug!("APP VERSION: {}", app.package_info().version.to_string());
+    tracing::debug!("COMMIT HASH: {}", env!("COMMIT_HASH"));
 
     let app_handle = app.app_handle().clone();
-    if cli::is_cli_detected() {
+    if is_cli_detected() {
+        tracing::debug!("CLI mode");
         tauri::async_runtime::spawn(async move {
             cli::run(&app_handle).await.map_err(|e| eyre!("{:?}", e)).log_error();
         });
     } else {
+        tracing::debug!("Non CLI mode");
         // Create main window
         let result = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()))
             .inner_size(800.0, 700.0)

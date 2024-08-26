@@ -35,7 +35,7 @@ use utils::LogError;
 
 fn main() -> Result<()> {
     // Attach console in Windows:
-    #[cfg(windows)]
+    #[cfg(all(windows, not(debug_assertions)))]
     cli::attach_console();
 
     tauri::Builder::default()

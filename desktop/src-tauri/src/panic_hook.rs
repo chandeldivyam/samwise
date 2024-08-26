@@ -1,5 +1,4 @@
 use crate::{
-    cli,
     cmd::is_portable,
     config,
     utils::{get_current_dir, LogError},
@@ -46,7 +45,8 @@ pub fn set_panic_hook(app: &AppHandle) -> Result<()> {
             .context("write")
             .map_err(|e| eyre!("{:?}", e))
             .log_error();
-        if !cli::is_cli_detected() {
+        // Open the log path in release mode
+        if !cfg!(debug_assertions) && !crate::cli::is_cli_detected() {
             showfile::show_path_in_file_manager(log_path.as_path());
         }
     }));
