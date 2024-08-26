@@ -25,3 +25,5 @@ node_modules/
 venv/
 *.bin
 *.onnx
+vulkan_sdk/
+vulkan_runtime/

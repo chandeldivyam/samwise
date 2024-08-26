@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LanguageInput from '~/components/LanguageInput'
 import Layout from '~/components/Layout'

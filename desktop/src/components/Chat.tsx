@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
 import { Segment, asSrt } from '~/lib/transcript'
 import { usePreferenceProvider } from '~/providers/Preference';
-import { useFilesContext } from '~/providers/FilesProvider';
 import { ReactComponent as DeleteIcon } from '~/icons/cancel.svg';
 import { ModifyState } from '~/lib/utils'
 
@@ -24,7 +23,6 @@ export interface Message {
 const Chat: React.FC<ChatProps> = ({ segments, messages, setMessages }) => {
   const { t } = useTranslation();
   const preference = usePreferenceProvider();
-  const { files } = useFilesContext();
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);

@@ -4718,7 +4718,7 @@ dependencies = [
 
 [[package]]
 name = "samwise"
-version = "0.0.6"
+version = "0.0.1"
 dependencies = [
  "axum",
  "chrono",
