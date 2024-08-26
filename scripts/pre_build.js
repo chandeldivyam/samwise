@@ -91,7 +91,7 @@ if (platform == 'linux') {
 if (platform == 'windows') {
 	// Setup FFMPEG
 	if (!(await fs.exists(config.ffmpegRealname))) {
-		await $`wget -nc --show-progress ${config.windows.ffmpegUrl} -O ${config.windows.ffmpegName}.7z`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.windows.ffmpegUrl} -O ${config.windows.ffmpegName}.7z`
 		await $`'C:\\Program Files\\7-Zip\\7z.exe' x ${config.windows.ffmpegName}.7z`
 		await $`mv ${config.windows.ffmpegName} ${config.ffmpegRealname}`
 		await $`rm -rf ${config.windows.ffmpegName}.7z`
@@ -100,7 +100,7 @@ if (platform == 'windows') {
 
 	// Setup OpenBlas
 	if (!(await fs.exists(config.openblasRealname)) && hasFeature('openblas')) {
-		await $`wget -nc --show-progress ${config.windows.openBlasUrl} -O ${config.windows.openBlasName}.zip`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.windows.openBlasUrl} -O ${config.windows.openBlasName}.zip`
 		await $`"C:\\Program Files\\7-Zip\\7z.exe" x ${config.windows.openBlasName}.zip -o${config.openblasRealname}`
 		await $`rm ${config.windows.openBlasName}.zip`
 		fs.cp(path.join(config.openblasRealname, 'include'), path.join(config.openblasRealname, 'lib'), { recursive: true, force: true })
@@ -110,7 +110,7 @@ if (platform == 'windows') {
 
 	// Setup CLBlast
 	if (!(await fs.exists(config.clblastRealname)) && !hasFeature('cuda')) {
-		await $`wget -nc --show-progress ${config.windows.clblastUrl} -O ${config.windows.clblastName}.zip`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.windows.clblastUrl} -O ${config.windows.clblastName}.zip`
 		await $`"C:\\Program Files\\7-Zip\\7z.exe" x ${config.windows.clblastName}.zip` // 7z file inside
 		await $`"C:\\Program Files\\7-Zip\\7z.exe" x ${config.windows.clblastName}.7z` // Inner folder
 		await $`mv ${config.windows.clblastName} ${config.clblastRealname}`
@@ -128,7 +128,7 @@ if (platform == 'windows') {
 if (platform == 'macos') {
 	// Setup FFMPEG
 	if (!(await fs.exists(config.ffmpegRealname))) {
-		await $`wget -nc --show-progress ${config.macos.ffmpegUrl} -O ${config.macos.ffmpegName}.tar.xz`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.macos.ffmpegUrl} -O ${config.macos.ffmpegName}.tar.xz`
 		await $`tar xf ${config.macos.ffmpegName}.tar.xz`
 		await $`mv ${config.macos.ffmpegName} ${config.ffmpegRealname}`
 		await $`rm ${config.macos.ffmpegName}.tar.xz`
@@ -200,11 +200,11 @@ if (hasFeature('rocm')) {
 // Diarization
 if (!(await fs.exists(config.diarization.embedModelFilename))) {
 	if (platform == 'windows') {
-		await $`wget -nc --show-progress ${config.diarization.embedModelUrl} -O ${config.diarization.embedModelFilename}`
-		await $`wget -nc --show-progress ${config.diarization.segmentModelUrl} -O ${config.diarization.segmentModelFilename}`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.diarization.embedModelUrl} -O ${config.diarization.embedModelFilename}`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.diarization.segmentModelUrl} -O ${config.diarization.segmentModelFilename}`
 	} else {
-		await $`wget -nc --show-progress ${config.diarization.embedModelUrl} -O ${config.diarization.embedModelFilename}`
-		await $`wget -nc --show-progress ${config.diarization.segmentModelUrl} -O ${config.diarization.segmentModelFilename}`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.diarization.embedModelUrl} -O ${config.diarization.embedModelFilename}`
+		await $`C:\\msys64\\usr\\bin\\wget.exe -nc --show-progress ${config.diarization.segmentModelUrl} -O ${config.diarization.segmentModelFilename}`
 	}
 }
 

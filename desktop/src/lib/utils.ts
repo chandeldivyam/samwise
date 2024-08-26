@@ -134,6 +134,7 @@ export async function getPrettyVersion() {
 }
 
 export async function getIssueUrl(logs: string) {
+	console.log(logs)
 	return 'https://github.com/chandeldivyam/samwise/issues/new/'
 }
 
