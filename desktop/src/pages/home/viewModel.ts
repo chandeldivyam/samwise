@@ -48,6 +48,7 @@ export function viewModel() {
 	const [inputDevice, setInputDevice] = useState<AudioDevice | null>(null)
 	const [outputDevice, setOutputDevice] = useState<AudioDevice | null>(null)
 	const [summary, setSummary] = useState<string>('')
+	const [summaryPrompt, setSummaryPrompt] = useState<string>('')
 	const [activeTab, setActiveTab] = useState<'transcript' | 'summary' | 'chat'>('transcript')
 	const [messages, setMessages] = useState<Message[]>([]);
 
@@ -72,7 +73,20 @@ export function viewModel() {
 		})
 		await listen<transcript.Segment>('new_segment', (event) => {
 			const { payload } = event
-			setSegments((prev) => (prev ? [...prev, payload] : [payload]))
+			setSegments((prev) => {
+				if (!prev) return [payload]
+				
+				// Check if the new segment is a duplicate
+				const isDuplicate = prev.some(segment => 
+					segment.start === payload.start &&
+					segment.stop === payload.stop &&
+					segment.text === payload.text &&
+					segment.speaker === payload.speaker
+				)
+				
+				// Only add the new segment if it's not a duplicate
+				return isDuplicate ? prev : [...prev, payload]
+			})
 		})
 	}
 
@@ -344,14 +358,20 @@ export function viewModel() {
 		setAudio(new Audio(convertFileSrc(recording.file_path)))
 	
 		const dbManager = getDbManager()
-		const [insights] = await dbManager.select<{ transcription: string, summary: string }>(
-		  'SELECT transcription, summary FROM recording_insights WHERE file_name = :fileName',
+		const [insights] = await dbManager.select<{ transcription: string, summary: string, summary_prompt: string }>(
+		  'SELECT transcription, summary, summary_prompt FROM recording_insights WHERE file_name = :fileName',
 		  { fileName: recording.name }
 		)
 	
 		if (insights && insights.transcription) {
 		  setSegments(JSON.parse(insights.transcription))
 		  setSummary(insights.summary)
+		  if (!insights.summary_prompt) {
+			setSummaryPrompt('')
+		  } 
+		  else {
+			setSummaryPrompt(insights.summary_prompt)
+		  }
 		} else {
 		  setSegments(null)
 		}
@@ -402,6 +422,8 @@ export function viewModel() {
 		handleRecordingClick,
 		summary,
 		setSummary,
+		summaryPrompt, 
+		setSummaryPrompt,
 		activeTab,
 		setActiveTab,
 		messages, 

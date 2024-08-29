@@ -11,6 +11,7 @@ pub struct TextGenerationOptions {
     pub ollama_base_url: String,
     pub ollama_model: String,
     pub google_api_key: String,
+    pub gemini_model: String,
     pub max_output_tokens: i32,
 }
 #[derive(Deserialize)]
@@ -66,8 +67,8 @@ async fn generate_text_ollama(options: &TextGenerationOptions, messages: Vec<Val
 async fn generate_text_gemini(options: &TextGenerationOptions, messages: Vec<Value>) -> Result<String> {
     let client = Client::new();
     let url = format!(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={}",
-        options.google_api_key
+        "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
+        options.gemini_model, options.google_api_key
     );
 
     debug!("Sending request to Google Gemini API");
@@ -93,12 +94,28 @@ async fn generate_text_gemini(options: &TextGenerationOptions, messages: Vec<Val
         .await
         .map_err(|e| {
             error!("Failed to send request to Google Gemini API: {}", e);
-            eyre!("Failed to send request to Google Gemini API: {}", e)
+            eyre!("Network error: Failed to send request to Google Gemini API. Please check your internet connection and try again.")
         })?;
+
+    if !response.status().is_success() {
+        let error_body: Value = response.json().await.map_err(|e| {
+            error!("Failed to parse error response from Google Gemini API: {}", e);
+            eyre!("Unexpected API response: Unable to parse error details. Please try again later.")
+        })?;
+
+        let error_message = error_body["error"]["message"].as_str().unwrap_or("Unknown error occurred");
+        let error_code = error_body["error"]["code"]
+            .as_u64()
+            .map(|code| code.to_string())
+            .unwrap_or_else(|| "Unknown".to_string());
+
+        error!("Google Gemini API error: {} (Code: {})", error_message, error_code);
+        return Err(eyre!("API Error (Code: {}): {}", error_code, error_message));
+    }
 
     let response_body: Value = response.json().await.map_err(|e| {
         error!("Failed to parse Google Gemini API response: {}", e);
-        eyre!("Failed to parse Google Gemini API response: {}", e)
+        eyre!("Unexpected API response: Unable to parse the response. Please try again later.")
     })?;
 
     response_body["candidates"][0]["content"]["parts"][0]["text"]
@@ -106,7 +123,7 @@ async fn generate_text_gemini(options: &TextGenerationOptions, messages: Vec<Val
         .map(|s| s.to_string())
         .ok_or_else(|| {
             error!("Failed to extract response text from Google Gemini API");
-            eyre!("Failed to extract response text from Google Gemini API")
+            eyre!("Unexpected API response: The response format was not as expected. Please try again later.")
         })
 }
 
@@ -119,8 +136,14 @@ fn convert_messages_to_gemini_format(messages: &[Value]) -> Result<Vec<Value>> {
                 .as_str()
                 .ok_or_else(|| eyre!("Missing content in message"))?;
 
+            let mapped_role = match role {
+                "user" => "user",
+                "assistant" => "model",
+                _ => role, // Keep other roles as they are
+            };
+
             Ok(json!({
-                "role": role,
+                "role": mapped_role,
                 "parts": [
                     {
                         "text": content

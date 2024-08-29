@@ -75,6 +75,7 @@ export interface ChatModelOptions {
 	ollama_base_url?: string
 	ollama_model?: string
 	gemini_api_key?: string
+	gemini_model?: string
 }
 
 const systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -92,7 +93,7 @@ export function PreferenceProvider({ children }: { children: ReactNode }) {
 	const [modelPath, setModelPath] = useLocalStorage<string | null>('prefs_model_path', null)
 	const [skippedSetup, setSkippedSetup] = useLocalStorage<boolean>('prefs_skipped_setup', false)
 	const [textAreaDirection, setTextAreaDirection] = useLocalStorage<Direction>('prefs_textarea_direction', 'ltr')
-	const [textFormat, setTextFormat] = useLocalStorage<TextFormat>('prefs_text_format', 'normal')
+	const [textFormat, setTextFormat] = useLocalStorage<TextFormat>('prefs_text_format', 'srt')
 	const isMounted = useRef<boolean>()
 	const [modelOptions, setModelOptions] = useLocalStorage<ModelOptions>('prefs_modal_args', {
 		init_prompt: '',
@@ -102,7 +103,7 @@ export function PreferenceProvider({ children }: { children: ReactNode }) {
 		temperature: 0.4,
 		max_text_ctx: undefined,
 		word_timestamps: false,
-		max_sentence_len: 1,
+		max_sentence_len: 92,
 	})
 	const [recognizeSpeakers, setRecognizeSpeakers] = useLocalStorage<boolean>('prefs_recognize_speakers', false)
 	const [maxSpeakers, setMaxSpeakers] = useLocalStorage<number>('prefs_max_speakers', 5)
@@ -116,6 +117,7 @@ export function PreferenceProvider({ children }: { children: ReactNode }) {
 		ollama_base_url: 'http://localhost:11434',
 		ollama_model: 'phi3.5',
 		gemini_api_key: '',
+		gemini_model: 'gemini-1.5-flash',
 	})
 
 	useEffect(() => {

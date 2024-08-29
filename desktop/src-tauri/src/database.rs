@@ -31,5 +31,12 @@ pub fn get_migrations() -> Vec<Migration> {
             );",
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 3,
+            description:
+                "ALTER TABLE recording_insights to add summary prompt as a recording property so that it doesn't get lost",
+            sql: "ALTER TABLE recording_insights ADD COLUMN summary_prompt TEXT;",
+            kind: MigrationKind::Up,
+        },
     ]
 }
