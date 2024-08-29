@@ -8,22 +8,22 @@ repository = "https://github.com/chandeldivyam/samwise"
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "=2.0.0-beta.19", features = [] }
+tauri-build = { version = "=2.0.0-rc.7", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-beta.25", features = ["protocol-asset", "devtools"] }
+tauri = { version = "=2.0.0-rc.8", features = ["protocol-asset", "devtools"] }
 
 # Plugins
-tauri-plugin-window-state = "=2.0.0-beta.11"
-tauri-plugin-fs = "=2.0.0-beta.11"
-tauri-plugin-updater = "2.0.0-beta.11"
-tauri-plugin-dialog = "2.0.0-beta.11"
-tauri-plugin-process = "2.0.0-beta.8"
-tauri-plugin-os = "2.0.0-beta.8"
-tauri-plugin-shell = "=2.0.0-beta.9"
-tauri-plugin-deep-link = "2.0.0-beta.9"
-tauri-plugin-store = "=2.0.0-beta.10"
-tauri-plugin-single-instance = "2.0.0-beta.11"
+tauri-plugin-window-state = "=2.0.0-rc.1"
+tauri-plugin-fs = "=2.0.0-rc.0"
+tauri-plugin-updater = "=2.0.0-rc.1"
+tauri-plugin-dialog = "=2.0.0-rc.2"
+tauri-plugin-process = "=2.0.0-rc.0"
+tauri-plugin-os = "=2.0.0-rc.0"
+tauri-plugin-shell = "=2.0.0-rc.2"
+tauri-plugin-deep-link = "=2.0.0-rc.1"
+tauri-plugin-store = "=2.0.0-rc.2"
+tauri-plugin-single-instance = "=2.0.0-rc.0"
 tauri-plugin-sql = { version = "2.0.0-beta.8", features = ["sqlite"] }
 
 tokio = { version = "1.35.1", features = ["net"] }
@@ -79,6 +79,7 @@ cocoa = "0.25.0"
 screencapturekit = { version = "0.2.8", features = ["ci"] }
 screencapturekit-sys = "0.2.8"
 objc_id = "0.1"
+core-graphics-helmer-fork = "0.24.0"
 
 [features]
 default = ["custom-protocol"]
