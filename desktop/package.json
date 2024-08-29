@@ -1,7 +1,7 @@
 {
   "name": "samwise",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -29,6 +29,7 @@
     "format-duration": "^3.0.2",
     "i18next": "^23.12.2",
     "i18next-resources-to-backend": "^1.2.1",
+    "posthog-js": "^1.160.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",

@@ -16,12 +16,11 @@ import ErrorModalWithContext from './components/ErrorModalWithContext'
 import { Toaster } from 'react-hot-toast'
 import { FilesProvider } from './providers/FilesProvider'
 import { ToastProvider } from './providers/Toast'
-import { initializeDatabase } from './lib/database'
+import { AnalyticsProvider } from './providers/Analytics';
 
 export default function App() {
 	const { i18n } = useTranslation()
 	document.body.dir = i18n.dir()
-	initializeDatabase()
 
 	return (
 		// Handle errors before first render
@@ -30,16 +29,18 @@ export default function App() {
 				<UpdaterProvider>
 					<PreferenceProvider>
 						<ToastProvider>
-							<Toaster />
-							<ErrorModalWithContext />
-							<UpdateProgress />
-							<FilesProvider>
-								<Routes>
-									<Route path="/" element={<HomePage />} />
-									<Route path="/setup" element={<SetupPage />} />
-									<Route path="/batch" element={<BatchPage />} />
-								</Routes>
-							</FilesProvider>
+							<AnalyticsProvider>
+								<Toaster />
+								<ErrorModalWithContext />
+								<UpdateProgress />
+								<FilesProvider>
+									<Routes>
+										<Route path="/" element={<HomePage />} />
+										<Route path="/setup" element={<SetupPage />} />
+										<Route path="/batch" element={<BatchPage />} />
+									</Routes>
+								</FilesProvider>
+							</AnalyticsProvider>
 						</ToastProvider>
 					</PreferenceProvider>
 				</UpdaterProvider>
