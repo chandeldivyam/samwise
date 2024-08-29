@@ -19,3 +19,4 @@ export const databaseName = 'sqlite:samwise.db'
 export const maxConnections = 5;
 
 export const supportedChatStrategies = ["ollama", "gemini"]
+export const supportedGeminiModels = ["gemini-1.5-flash", "gemini-1.5-pro"]

@@ -1,12 +1,14 @@
 // src/components/Chat.tsx
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
 import { Segment, asSrt } from '~/lib/transcript'
 import { usePreferenceProvider } from '~/providers/Preference';
 import { ReactComponent as DeleteIcon } from '~/icons/cancel.svg';
 import { ModifyState } from '~/lib/utils'
+import { ErrorModalContext } from '~/providers/ErrorModal'
+import ReactMarkdown from 'react-markdown';
 
 interface ChatProps {
   segments: Segment[] | null;
@@ -25,6 +27,7 @@ const Chat: React.FC<ChatProps> = ({ segments, messages, setMessages }) => {
   const preference = usePreferenceProvider();
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { setState: setErrorModal } = useContext(ErrorModalContext)
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,8 +71,11 @@ const Chat: React.FC<ChatProps> = ({ segments, messages, setMessages }) => {
         ollama_base_url: preference.chatModelOptions.ollama_base_url,
         ollama_model: preference.chatModelOptions.ollama_model,
         google_api_key: preference.chatModelOptions.gemini_api_key,
-        max_output_tokens: 1024,
+		gemini_model: preference.chatModelOptions.gemini_model,
+        max_output_tokens: 2048,
       };
+	  
+	  console.log(chatMessages)
 
       const result = await invoke<string>('process_chat_message', {
         options,
@@ -87,7 +93,7 @@ const Chat: React.FC<ChatProps> = ({ segments, messages, setMessages }) => {
 
     } catch (error) {
       console.error('Error in chat:', error);
-      alert(t('common.chat-error'));
+      setErrorModal({open: true, log: String(error)})
     } finally {
       setIsLoading(false);
     }
@@ -102,23 +108,23 @@ const Chat: React.FC<ChatProps> = ({ segments, messages, setMessages }) => {
       <h2 className="text-2xl font-bold mb-4 text-base-content">{t('common.chat')}</h2>
       
       <div ref={chatContainerRef} className="flex-grow overflow-auto mb-4 space-y-4">
-        {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-3/4 p-3 rounded-lg relative group ${
-              message.role === 'user' 
-                ? 'bg-primary text-primary-content' 
-                : 'bg-neutral text-neutral-content'
-            }`}>
-              {message.content}
-              <button 
-                onClick={() => handleDeleteMessage(message.id)} 
-                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              >
-                <DeleteIcon className="w-4 h-4 text-base-content hover:text-error" />
-              </button>
-            </div>
-          </div>
-        ))}
+	  	{messages.map((message) => (
+			<div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+				<div className={`max-w-3/4 p-3 rounded-lg relative group ${
+				message.role === 'user' 
+					? 'bg-primary text-primary-content' 
+					: 'bg-neutral text-neutral-content'
+				}`}>
+					<ReactMarkdown>{message.content}</ReactMarkdown>
+					<button 
+					onClick={() => handleDeleteMessage(message.id)} 
+					className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+					>
+					<DeleteIcon className="w-4 h-4 text-base-content hover:text-error" />
+					</button>
+				</div>
+			</div>
+		))}
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-neutral text-neutral-content p-3 rounded-lg">

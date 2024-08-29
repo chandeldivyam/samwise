@@ -8,7 +8,7 @@ import AudioInput from '~/pages/home/AudioInput'
 import AudioPlayer from './AudioPlayer'
 import ProgressPanel from './ProgressPanel'
 import { viewModel } from './viewModel'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import * as webviewWindow from '@tauri-apps/api/webviewWindow'
 import AudioDeviceInput from '~/components/AudioDeviceInput'
 import { ReactComponent as FileIcon } from '~/icons/file.svg'
@@ -21,6 +21,9 @@ import Chat from '~/components/Chat'
 export default function Home() {
 	const { t } = useTranslation()
 	const vm = viewModel()
+	const transcriptRef = useRef<HTMLDivElement>(null)
+	const summaryRef = useRef<HTMLDivElement>(null)
+	const chatRef = useRef<HTMLDivElement>(null)
 
 	async function showWindow() {
 		const currentWindow = webviewWindow.getCurrentWebviewWindow()
@@ -34,6 +37,18 @@ export default function Home() {
 		showWindow()
 	}, [])
 
+	useEffect(() => {
+		setTimeout(() => {
+		  if (vm.activeTab === 'transcript' && transcriptRef.current) {
+			transcriptRef.current.scrollIntoView({ behavior: 'smooth' });
+		  } else if (vm.activeTab === 'summary' && summaryRef.current) {
+			summaryRef.current.scrollIntoView({ behavior: 'smooth' });
+		  } else if (vm.activeTab === 'chat' && chatRef.current) {
+			chatRef.current.scrollIntoView({ behavior: 'smooth' });
+		  }
+		}, 100); // Add a small delay to ensure refs are set
+	  }, [vm.activeTab, vm.summary]);
+	  	  
 	return (
 		<Layout>
 			<div role="tablist" className="tabs tabs-lifted flex m-auto mt-5">
@@ -79,7 +94,7 @@ export default function Home() {
 					<div className="h-20" />
 					{vm.loading && <ProgressPanel isAborting={vm.isAborting} onAbort={vm.onAbort} progress={vm.progress} />}
 					{(vm.segments || vm.loading) && (
-						<div className="flex flex-col mt-5 items-center w-[90%] max-w-[1000px] h-[84vh] m-auto">
+						<div ref={transcriptRef} className="flex flex-col mt-5 items-center w-[90%] max-w-[1000px] h-[84vh] m-auto">
 							<div className="tabs tabs-boxed mb-4">
 							<a 
 								className={`tab ${vm.activeTab === 'transcript' ? 'tab-active' : ''}`}
@@ -110,19 +125,25 @@ export default function Home() {
 							/>
 							)}
 							{vm.activeTab === 'summary' && (
-								<Summary 
-									summary={vm.summary} 
-									loading={vm.loading} 
-									setSummary={vm.setSummary} 
-									segments={vm.segments}
-								/>
+								<div ref={summaryRef} className="flex flex-col mt-5 items-center w-[100%] max-w-[1000px] h-[84vh] m-auto">
+									<Summary 
+										summary={vm.summary} 
+										loading={vm.loading} 
+										setSummary={vm.setSummary} 
+										segments={vm.segments}
+										summaryPrompt={vm.summaryPrompt ? vm.summaryPrompt : ''}
+										setSummaryPrompt={vm.setSummaryPrompt}
+									/>
+								</div>
 							)}
 							{vm.activeTab === 'chat' && (
-								<Chat 
-									segments={vm.segments} 
-									messages={vm.messages}
-									setMessages={vm.setMessages}
-								/>
+								<div ref={chatRef} className="flex flex-col mt-5 items-center w-[100%] max-w-[1000px] h-[84vh] m-auto">
+									<Chat 
+										segments={vm.segments} 
+										messages={vm.messages}
+										setMessages={vm.setMessages}
+									/>
+								</div>
 							)}
 						</div>
 					)}
@@ -135,15 +156,6 @@ export default function Home() {
 						<div className="">
 							<AudioDeviceInput device={vm.inputDevice} setDevice={vm.setInputDevice} devices={vm.devices} type="input" />
 							<AudioDeviceInput device={vm.outputDevice} setDevice={vm.setOutputDevice} devices={vm.devices} type="output" />
-							{/* <label className="label cursor-pointer mt-2 mb-5">
-								<span className="label-text">{t('common.save-record-in-documents-folder')}</span>
-								<input
-									type="checkbox"
-									className="toggle toggle-primary"
-									onChange={(e) => vm.preference.setStoreRecordInDocuments(e.target.checked)}
-									checked={vm.preference.storeRecordInDocuments}
-								/>
-							</label> */}
 						</div>
 						{!vm.isRecording && (
 							<button onMouseDown={() => vm.startRecord()} className="btn btn-primary mt-3">

@@ -9,7 +9,8 @@ async fn test_text_generation() {
         ollama_base_url: "http://localhost:11434".to_string(),
         ollama_model: "phi3.5".to_string(),
         google_api_key: "gemini_api_key".to_string(),
-        max_output_tokens: 100,
+        max_output_tokens: 1024,
+        gemini_model: "gemini-1.5-flash".to_string(),
     };
 
     let messages = vec![json!({"role": "user", "content": "Hello! tell me a joke"})];

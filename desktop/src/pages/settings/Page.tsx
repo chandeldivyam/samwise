@@ -10,7 +10,7 @@ import { ReactComponent as CopyIcon } from '~/icons/copy.svg'
 
 import * as config from '~/lib/config'
 import { supportedLanguages } from '~/lib/i18n'
-import { supportedChatStrategies } from '~/lib/config'
+import { supportedChatStrategies, supportedGeminiModels } from '~/lib/config'
 import { ModifyState, cx } from '~/lib/utils'
 import { viewModel } from './viewModel'
 import * as os from '@tauri-apps/plugin-os'
@@ -139,21 +139,42 @@ export default function SettingsPage({ setVisible }: SettingsPageProps) {
 				)}
 
 				{vm.preference.chatModelOptions.strategy === 'gemini' && (
-					<label className="form-control w-full">
-					<div className="label">
-						<span className="label-text flex items-center gap-1">
-						<InfoTooltip text={t('common.gemini_api_key_info')} />
-						{t('common.gemini_api_key')}
-						</span>
-					</div>
-					<input
-						type="password"
-						className="input input-bordered"
-						value={vm.preference.chatModelOptions.gemini_api_key}
-						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, gemini_api_key: e.target.value})}
-						placeholder="Your Gemini API Key"
-					/>
-					</label>
+					<>
+						<label className="form-control w-full">
+							<div className="label">
+							<span className="label-text flex items-center gap-1">
+								<InfoTooltip text={t('common.gemini_model_info')} />
+								{t('common.gemini_model')}
+							</span>
+							</div>
+							<select
+							onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, gemini_model: e.target.value})}
+							value={vm.preference.chatModelOptions.gemini_model}
+							className="select select-bordered capitalize">
+							{supportedGeminiModels.map((gemini_model) => (
+								<option key={gemini_model} value={gemini_model}>
+								{gemini_model}
+								</option>
+							))}
+							</select>
+						</label>
+					
+						<label className="form-control w-full">
+							<div className="label">
+								<span className="label-text flex items-center gap-1">
+								<InfoTooltip text={t('common.gemini_api_key_info')} />
+								{t('common.gemini_api_key')}
+								</span>
+							</div>
+							<input
+								type="password"
+								className="input input-bordered"
+								value={vm.preference.chatModelOptions.gemini_api_key}
+								onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, gemini_api_key: e.target.value})}
+								placeholder="Your Gemini API Key"
+							/>
+						</label>
+					</>
 				)}
 			</div>
 

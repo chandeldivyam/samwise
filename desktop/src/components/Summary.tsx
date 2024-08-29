@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ModifyState } from '~/lib/utils'
 import { Segment, asSrt } from '~/lib/transcript'
@@ -7,23 +7,28 @@ import { usePreferenceProvider } from '~/providers/Preference'
 import { useFilesContext } from '~/providers/FilesProvider'
 import { getDbManager } from '~/lib/database' 
 import ReactMarkdown from 'react-markdown'
+import { ErrorModalContext } from '~/providers/ErrorModal'
 
 interface SummaryProps {
   summary: string
   loading: boolean
   setSummary: ModifyState<string>
   segments: Segment[] | null
+  summaryPrompt: string
+  setSummaryPrompt: ModifyState<string>
 }
 
-const Summary: React.FC<SummaryProps> = ({ summary, loading, setSummary, segments }) => {
+const Summary: React.FC<SummaryProps> = ({ summary, loading, setSummary, segments, summaryPrompt, setSummaryPrompt }) => {
   const { t } = useTranslation()
   const preference = usePreferenceProvider()
   const { files } = useFilesContext()
-  const [summaryPrompt, setSummaryPrompt] = useState(defaultSummaryPrompt)
   const [generatingSummary, setGeneratingSummary] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editableSummary, setEditableSummary] = useState(summary)
   const editTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const { setState: setErrorModal } = useContext(ErrorModalContext)
+
+  setSummaryPrompt(summaryPrompt || defaultSummaryPrompt)
 
   useEffect(() => {
     setEditableSummary(summary)
@@ -39,7 +44,7 @@ const Summary: React.FC<SummaryProps> = ({ summary, loading, setSummary, segment
     if (files.length === 1) {
       const dbManager = getDbManager();
       await dbManager.update('recording_insights',
-        { summary: editableSummary },
+        { summary: editableSummary, summary_prompt: summaryPrompt },
         'file_name = :fileName',
         { fileName: files[0].name }
       );
@@ -85,7 +90,8 @@ const Summary: React.FC<SummaryProps> = ({ summary, loading, setSummary, segment
         ollama_base_url: preference.chatModelOptions.ollama_base_url,
         ollama_model: preference.chatModelOptions.ollama_model,
         google_api_key: preference.chatModelOptions.gemini_api_key,
-        max_output_tokens: 1024,
+		gemini_model: preference.chatModelOptions.gemini_model,
+        max_output_tokens: 4096,
       }
 
       const result = await invoke<string>('process_chat_message', {
@@ -98,14 +104,13 @@ const Summary: React.FC<SummaryProps> = ({ summary, loading, setSummary, segment
 	  if (files.length === 1) {
 		const dbManager = getDbManager();
 		await dbManager.update('recording_insights',
-			{ summary: result },
+			{ summary: result, summary_prompt: summaryPrompt },
 			'file_name = :fileName',
 			{ fileName: files[0].name }
 		  );
 	  }
     } catch (error) {
-      console.error('Error generating summary:', error)
-      alert(t('common.summary-generation-error'))
+      setErrorModal({'open': true, 'log': String(error)})
     } finally {
       setGeneratingSummary(false)
     }
@@ -175,50 +180,33 @@ const Summary: React.FC<SummaryProps> = ({ summary, loading, setSummary, segment
   )
 }
 
-const defaultSummaryPrompt = `You are an expert executive assistant tasked with creating a detailed, informative summary of a meeting transcript. Your goal is to extract key insights and relevant information so that people don't need to listen to the recording. Please analyze the provided transcript and create a summary that includes:
+const defaultSummaryPrompt = `Please analyze the meeting transcript and provide a structured summary with the following elements:
 
-- Meeting Overview:
-   - Main topic or purpose of the meeting
-   - Key participants (if identifiable)
+1. Overall meeting structure:
+   - Start and end times
+   - Total duration
+   - Number of main topics discussed
 
-- Meeting Timeline:
-    - Main topics discussed and oneliner about them
+2. Detailed topic-wise breakdown:
+   - For each main topic:
+     a. Topic title or brief description
+     b. Start and end timestamps
+     c. Duration of discussion
+     d. Key points discussed (2-3 bullet points)
+     e. Participants who contributed significantly to this topic
 
-- Key Points and Decisions:
-   - List the most important points discussed
-   - Highlight any decisions made
-   - Note any significant agreements or disagreements
+3. Information clusters:
+   - Group related subtopics or recurring themes
+   - Provide a brief description for each cluster
+   - List the timestamps where these clusters were discussed
 
-- Action Items and Next Steps:
-   - Extract any tasks, assignments, or follow-up actions
-   - Include responsible parties and deadlines if mentioned
+4. Action items and decisions:
+   - List any clear action items or decisions made
+   - Include associated timestamps and responsible parties (if mentioned)
 
-- Project Updates (if applicable):
-   - Summarize current status of any projects discussed
-   - Note any challenges, progress, or changes in direction
+5. Timeline overview:
+   - Create a brief timeline of the meeting, showing how topics flowed from one to another
 
-- Important Details:
-   - Include any critical numbers, dates, or facts mentioned
-   - Highlight any strategic insights or unique ideas presented
-
-- Questions and Open Issues:
-   - List any unanswered questions or topics requiring further discussion
-
-- Overall Summary:
-   - Provide a detailed, low-level summary of the meeting's outcome and significance
-
-Guidelines:
-- The speaker diarization is not proper. So use your intelligence about who could be whom.
-- If the transcript is short or generic, focus only on relevant points. 
-- If there's little of substance, state "This meeting contained minimal actionable or strategic content."
-- Aim for clarity and conciseness.
-- Use bullet points and clear headings for easy scanning.
-- If technical terms are used, provide brief explanations if necessary for context.
-- Maintain a professional, neutral tone throughout the summary.
-- Use only MARKDOWN format for the response
-- DO NOT MISS Factual information under any circumstance. This is very important, try to mention all the proper nouns and facts mentioned.
-- Following the above mentioned strucutre is not necessary. Think for youself and figure out how can you add value to the user
-
-Based on the transcript provided, generate a meeting summary following these guidelines.`
+Please organize the summary in a clear, easy-to-read in as MARKDOWN format.`
 
 export default Summary

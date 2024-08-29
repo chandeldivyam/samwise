@@ -173,7 +173,7 @@ export default function ModelOptions({ options, setOptions }: ParamsProps) {
 					</div>
 					<input
 						value={options.max_sentence_len}
-						onChange={(e) => setOptions({ ...options, max_sentence_len: parseInt(e.target.value) ?? 1 })}
+						onChange={(e) => setOptions({ ...options, max_sentence_len: parseInt(e.target.value) ?? 92 })}
 						className="input input-bordered"
 						type="number"
 					/>
