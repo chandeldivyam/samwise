@@ -74,6 +74,7 @@ export interface ChatModelOptions {
 	strategy: string
 	ollama_base_url?: string
 	ollama_model?: string
+	ollama_api_key?: string
 	gemini_api_key?: string
 	gemini_model?: string
 }
@@ -114,8 +115,9 @@ export function PreferenceProvider({ children }: { children: ReactNode }) {
 
 	const [chatModelOptions, setChatModelOptions] = useLocalStorage<ChatModelOptions>('prefs_chat_model_args', {
 		strategy: 'ollama',
-		ollama_base_url: 'http://localhost:11434',
-		ollama_model: 'phi3.5',
+		ollama_base_url: 'https://api.openai.com',
+		ollama_model: 'gpt-4o-mini',
+		ollama_api_key: '',
 		gemini_api_key: '',
 		gemini_model: 'gemini-1.5-flash',
 	})

@@ -92,14 +92,18 @@ export default function SettingsPage({ setVisible }: SettingsPageProps) {
 					</span>
 					</div>
 					<select
-					onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, strategy: e.target.value})}
-					value={vm.preference.chatModelOptions.strategy}
-					className="select select-bordered capitalize">
-					{supportedChatStrategies.map((strategy) => (
-						<option key={strategy} value={strategy}>
-						{strategy}
-						</option>
-					))}
+						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, strategy: e.target.value})}
+						value={vm.preference.chatModelOptions.strategy}
+						className="select select-bordered capitalize"
+						>
+						{supportedChatStrategies.map((strategy) => {
+							const [key, value] = Object.entries(strategy)[0];
+							return (
+							<option key={key} value={value}>
+								{key}
+							</option>
+							);
+						})}
 					</select>
 				</label>
 
@@ -117,7 +121,7 @@ export default function SettingsPage({ setVisible }: SettingsPageProps) {
 						className="input input-bordered"
 						value={vm.preference.chatModelOptions.ollama_base_url}
 						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, ollama_base_url: e.target.value})}
-						placeholder="http://localhost:11434"
+						placeholder="https://api.openai.com"
 						/>
 					</label>
 					<label className="form-control w-full">
@@ -133,6 +137,21 @@ export default function SettingsPage({ setVisible }: SettingsPageProps) {
 						value={vm.preference.chatModelOptions.ollama_model}
 						onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, ollama_model: e.target.value})}
 						placeholder="phi3.5"
+						/>
+					</label>
+					<label className="form-control w-full">
+						<div className="label">
+						<span className="label-text flex items-center gap-1">
+							<InfoTooltip text={t('common.ollama_api_key_info')} />
+							{t('common.ollama_api_key')}
+						</span>
+						</div>
+						<input
+							type="password"
+							className="input input-bordered"
+							value={vm.preference.chatModelOptions.ollama_api_key}
+							onChange={(e) => vm.preference.setChatModelOptions({...vm.preference.chatModelOptions, ollama_api_key: e.target.value})}
+							placeholder=""
 						/>
 					</label>
 					</>
