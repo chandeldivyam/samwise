@@ -10,6 +10,7 @@ use tracing::{debug, error};
 pub struct TextGenerationOptions {
     pub ollama_base_url: String,
     pub ollama_model: String,
+    pub ollama_api_key: String,
     pub google_api_key: String,
     pub gemini_model: String,
     pub max_output_tokens: i32,
@@ -39,6 +40,8 @@ async fn generate_text_ollama(options: &TextGenerationOptions, messages: Vec<Val
 
     let response = client
         .post(&url)
+        .header("Content-Type", "application/json")
+        .header("Authorization", format!("Bearer {}", options.ollama_api_key))
         .json(&json!({
             "model": options.ollama_model,
             "messages": messages,

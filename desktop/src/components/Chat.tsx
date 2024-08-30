@@ -70,6 +70,7 @@ const Chat: React.FC<ChatProps> = ({ segments, messages, setMessages }) => {
       const options = {
         ollama_base_url: preference.chatModelOptions.ollama_base_url,
         ollama_model: preference.chatModelOptions.ollama_model,
+		ollama_api_key: preference.chatModelOptions.ollama_api_key,
         google_api_key: preference.chatModelOptions.gemini_api_key,
 		gemini_model: preference.chatModelOptions.gemini_model,
         max_output_tokens: 2048,
