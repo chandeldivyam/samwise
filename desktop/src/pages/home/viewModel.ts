@@ -22,6 +22,7 @@ import { ModelOptions, usePreferenceProvider } from '~/providers/Preference'
 import { UpdaterContext } from '~/providers/Updater'
 import { Recording } from './Dashboard'
 import { Message } from '~/components/Chat'
+import { useAnalytics } from '~/providers/Analytics';
 
 export interface BatchOptions {
 	files: NamedPath[]
@@ -54,6 +55,8 @@ export function viewModel() {
 
 	const { updateApp, availableUpdate } = useContext(UpdaterContext)
 	const { setState: setErrorModal } = useContext(ErrorModalContext)
+
+	const { capture } = useAnalytics();
 
 	async function onFilesChanged() {
 		if (files.length === 1) {
@@ -375,6 +378,7 @@ export function viewModel() {
 		} else {
 		  setSegments(null)
 		}
+		capture('recording_viewed');
 	}
 
 	async function renameRecording(id: number, newName: string) {
